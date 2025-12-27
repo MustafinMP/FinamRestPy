@@ -7,7 +7,7 @@ from schemas.trade_side import TradeSide
 
 
 @dataclass
-class TradeSchema:
+class AccountTradeSchema:
     trade_id: str
     symbol: str
     price: float
@@ -18,8 +18,8 @@ class TradeSchema:
     account_id: str
 
     @classmethod
-    def from_dict(cls, response_dict: dict) -> TradeSchema:
-        return TradeSchema(
+    def from_dict(cls, response_dict: dict) -> AccountTradeSchema:
+        return AccountTradeSchema(
             trade_id=response_dict['trade_id'],
             symbol=response_dict['symbol'],
             price=float(response_dict['price']['value']),

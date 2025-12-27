@@ -1,15 +1,31 @@
+from datetime import datetime
+
 import requests
 
 from _services.base_service import BaseService
-from schemas.market_schemas import BarsResponse
+from schemas.market_schemas import BarsResponse, TimeFrame
 
 
 class MarketService(BaseService):
-    def get_bars(self, symbol: str) -> ...:
+    def get_bars(
+            self,
+            symbol: str,
+            timeframe: TimeFrame,
+            end_time: datetime,
+            start_time: datetime = None
+    ) -> BarsResponse:
         url = f'{self._base_url}instruments/{symbol}/bars'
-        response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
+        params = {
+            'symbol': symbol,
+            'timeframe': timeframe.value,
+            'interval.end_time': end_time.isoformat() + 'Z'
+        }
+        if start_time:
+            params['interval.start_time'] = start_time.isoformat() + 'Z'
+
+        response = requests.get(url, headers=self._headers(), params=params)
         if response.status_code == 200:
-            return BarsResponse(response.json())
+            return BarsResponse.from_dict(response.json())
         return None
 
     def get_last_quotes(self, symbol: str) -> ...:
