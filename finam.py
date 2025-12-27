@@ -3,6 +3,7 @@ import json
 import requests
 
 from _services.account import AccountService
+from _services.market import MarketService
 from _services.order import OrderService
 
 
@@ -23,7 +24,7 @@ class Finam:
         self.account = AccountService(self._jwt_token, self._account_id, self._base_url)
         self.instruments = None
         self.orders = OrderService(self._jwt_token, self._account_id, self._base_url)
-        self.market = None
+        self.market = MarketService(self._jwt_token, self._account_id, self._base_url)
         self.metrics = None
 
     def set_account(self, account_id: str) -> None:

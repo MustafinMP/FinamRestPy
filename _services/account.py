@@ -3,8 +3,7 @@ from datetime import datetime
 import requests
 
 from _services.base_service import BaseService
-from schemas.account_schema import AccountSchema
-from schemas.trade_schema import TradeSchema
+from schemas.account_schemas import AccountSchema, TradeSchema
 
 
 class AccountService(BaseService):

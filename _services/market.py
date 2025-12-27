@@ -1,6 +1,7 @@
 import requests
 
 from _services.base_service import BaseService
+from schemas.market_schemas import BarsResponse
 
 
 class MarketService(BaseService):
@@ -8,7 +9,7 @@ class MarketService(BaseService):
         url = f'{self._base_url}instruments/{symbol}/bars'
         response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
         if response.status_code == 200:
-            return response.json()
+            return BarsResponse(response.json())
         return None
 
     def get_last_quotes(self, symbol: str) -> ...:
