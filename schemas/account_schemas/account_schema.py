@@ -24,7 +24,7 @@ class AccountSchema:
             account_id=str(response_dict['account_id']),
             type=str(response_dict['type']),
             status=str(response_dict['status']),
-            equity=float(response_dict['type']['value']),
+            equity=float(response_dict['equity']['value']),
             unrealized_profit=float(response_dict['unrealized_profit']['value']),
             positions=[PositionSchema.from_dict(p) for p in response_dict['positions']],
             cash=[MoneySchema.from_dict(c) for c in response_dict['cash']]

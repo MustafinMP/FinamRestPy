@@ -16,10 +16,10 @@ class BarSchema:
     @classmethod
     def from_dict(cls, bar_dict: dict) -> BarSchema:
         return BarSchema(
-            timestamp=datetime.strptime(bar_dict['timestamp'], "%Y-%m-%dT%H:%M:%S.%fZ"),
+            timestamp=datetime.strptime(bar_dict['timestamp'], "%Y-%m-%dT%H:%M:%SZ"),
             open=float(bar_dict['open']['value']),
             high=float(bar_dict['high']['value']),
             low=float(bar_dict['low']['value']),
             close=float(bar_dict['close']['value']),
-            volume=int(bar_dict['volume']['value']),
+            volume=int(float(bar_dict['volume']['value'])),
         )

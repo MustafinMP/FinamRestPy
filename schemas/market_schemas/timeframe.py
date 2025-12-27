@@ -8,7 +8,8 @@ class TimeFrame(Enum):
     TIME_FRAME_M1 = 1  # 1 минута. Глубина данных 7 дней.
     TIME_FRAME_M5 = 5  # 5 минут. Глубина данных 30 дней.
     TIME_FRAME_M15 = 9  # 15 минут. Глубина данных 30 дней.
-    TIME_FRAME_M30 = 11  # 30 минут. Глубина данных 30 дней. TIME_FRAME_H1 12 1 час.Глубина данных 30 дней.
+    TIME_FRAME_M30 = 11  # 30 минут. Глубина данных 30 дней.
+    TIME_FRAME_H1 = 12 # 1 час. Глубина данных 30 дней.
     TIME_FRAME_H2 = 13  # 2 часа. Глубина данных 30 дней.
     TIME_FRAME_H4 = 15  # 4 часа. Глубина данных 30 дней.
     TIME_FRAME_H8 = 17  # 8 часов. Глубина данных 30 дней.
@@ -25,6 +26,7 @@ class TimeFrame(Enum):
             case 'TIME_FRAME_M5': return cls.TIME_FRAME_M5
             case 'TIME_FRAME_M15': return cls.TIME_FRAME_M15
             case 'TIME_FRAME_M30': return cls.TIME_FRAME_M30
+            case 'TIME_FRAME_H1': return cls.TIME_FRAME_H1
             case 'TIME_FRAME_H2': return cls.TIME_FRAME_H2
             case 'TIME_FRAME_H4': return cls.TIME_FRAME_H4
             case 'TIME_FRAME_H8': return cls.TIME_FRAME_H8
