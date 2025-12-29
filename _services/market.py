@@ -3,7 +3,7 @@ from datetime import datetime
 import requests
 
 from _services.base_service import BaseService
-from schemas.market_schemas import BarsResponse, TimeFrame
+from schemas.market_schemas import BarsResponse, TimeFrame, QuoteSchema
 
 
 class MarketService(BaseService):
@@ -28,11 +28,11 @@ class MarketService(BaseService):
             return BarsResponse.from_dict(response.json())
         return None
 
-    def get_last_quotes(self, symbol: str) -> ...:
+    def get_last_quote(self, symbol: str) -> ...:
         url = f'{self._base_url}instruments/{symbol}/quotes/latest'
         response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
         if response.status_code == 200:
-            return response.json()
+            return QuoteSchema.from_dict(response.json())
         return None
 
     def get_trades(self, symbol: str) -> ...:
