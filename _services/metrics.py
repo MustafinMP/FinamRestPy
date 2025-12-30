@@ -5,7 +5,7 @@ from schemas.metric_schemas import QuotaUsageMetricsSchema
 
 
 class MetricsService(BaseService):
-    def get_last_quote(self) -> ...:
+    def get_last_quote(self) -> QuotaUsageMetricsSchema:
         url = f'{self._base_url}usage'
         response = requests.get(url, headers=self._headers())
         if response.status_code == 200:

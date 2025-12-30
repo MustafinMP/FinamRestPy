@@ -28,21 +28,21 @@ class MarketService(BaseService):
             return BarsResponse.from_dict(response.json())
         return None
 
-    def get_last_quote(self, symbol: str) -> ...:
+    def get_last_quote(self, symbol: str) -> QuoteSchema:
         url = f'{self._base_url}instruments/{symbol}/quotes/latest'
         response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
         if response.status_code == 200:
             return QuoteSchema.from_dict(response.json())
         return None
 
-    def get_latest_trades(self, symbol: str) -> ...:
+    def get_latest_trades(self, symbol: str) -> LatestTradesResponse:
         url = f'{self._base_url}instruments/{symbol}/trades/latest'
         response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
         if response.status_code == 200:
             return LatestTradesResponse.from_dict(response.json())
         return None
 
-    def get_order_book(self, symbol: str) -> ...:
+    def get_order_book(self, symbol: str) -> OrderBookSchema:
         url = f'{self._base_url}instruments/{symbol}/orderbook'
         response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
         if response.status_code == 200:
