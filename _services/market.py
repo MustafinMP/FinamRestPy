@@ -3,7 +3,7 @@ from datetime import datetime
 import requests
 
 from _services.base_service import BaseService
-from schemas.market_schemas import BarsResponse, TimeFrame, QuoteSchema
+from schemas.market_schemas import BarsResponse, TimeFrame, QuoteSchema, LatestTradesResponse, OrderBookSchema
 
 
 class MarketService(BaseService):
@@ -35,16 +35,16 @@ class MarketService(BaseService):
             return QuoteSchema.from_dict(response.json())
         return None
 
-    def get_trades(self, symbol: str) -> ...:
+    def get_latest_trades(self, symbol: str) -> ...:
         url = f'{self._base_url}instruments/{symbol}/trades/latest'
         response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
         if response.status_code == 200:
-            return response.json()
+            return LatestTradesResponse.from_dict(response.json())
         return None
 
     def get_order_book(self, symbol: str) -> ...:
         url = f'{self._base_url}instruments/{symbol}/orderbook'
         response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
         if response.status_code == 200:
-            return response.json()
+            return OrderBookSchema.from_dict(response.json())
         return None
