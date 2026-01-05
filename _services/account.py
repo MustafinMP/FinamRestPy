@@ -3,7 +3,7 @@ from datetime import datetime
 import requests
 
 from _services.base_service import BaseService
-from schemas.account_schemas import AccountSchema, AccountTradeSchema
+from schemas.account_schemas import AccountSchema, AccountTradeSchema, TransactionSchema
 
 
 class AccountService(BaseService):
@@ -27,5 +27,15 @@ class AccountService(BaseService):
             return [AccountTradeSchema.from_dict(t) for t in response.json()['trades']]
         return None
 
-    def transactions(self):
-        ...  # нет необходимости реализовывать сейчас
+    def transactions(self, end_time: datetime, start_time: datetime = None, limit: int = None) -> list[TransactionSchema]:
+        url = f'{self._base_url}accounts/{self._account_id}/transactions'
+        params = {'interval.end_time': end_time.isoformat() + 'Z'}
+        if start_time:
+            params['interval.start_time'] = start_time.isoformat() + 'Z'
+        if limit:
+            params['limit'] = limit
+
+        response = requests.get(url, params=params, headers=self._headers())
+        if response.status_code == 200:
+            return [TransactionSchema.from_dict(t) for t in response.json()['transactions']]
+        return None

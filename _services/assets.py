@@ -37,9 +37,10 @@ class AssetService(BaseService):
             return FullAssetSchema.from_dict(response.json())
         return None
 
-    def get_asset_params(self, symbol: str, account_id: str):
+    def get_asset_params(self, symbol: str, account_id: str = None):
         url = f'{self._base_url}/assets/{symbol}/params'
-        response = requests.get(url, headers=self._headers(), params={'symbol': symbol, 'account_id': account_id})
+        params = {'symbol': symbol, 'account_id': account_id if account_id else self._account_id}
+        response = requests.get(url, headers=self._headers(), params=params)
         if response.status_code == 200:
             return AssetParamsSchema.from_dict(response.json())
         return None
