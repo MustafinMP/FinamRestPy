@@ -3,6 +3,7 @@ import json
 import requests
 
 from _services.account import AccountService
+from _services.assets import AssetService
 from _services.market import MarketService
 from _services.metrics import MetricsService
 from _services.order import OrderService
@@ -23,7 +24,7 @@ class Finam:
         self._jwt_token = response.json()['token']
 
         self.account = AccountService(self._jwt_token, self._account_id, self._base_url)
-        self.instruments = None
+        self.instruments = AssetService(self._jwt_token, self._account_id, self._base_url)
         self.orders = OrderService(self._jwt_token, self._account_id, self._base_url)
         self.market = MarketService(self._jwt_token, self._account_id, self._base_url)
         self.metrics = MetricsService(self._jwt_token, self._account_id, self._base_url)

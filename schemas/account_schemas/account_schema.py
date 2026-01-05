@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from schemas.account_schemas.money_schema import MoneySchema
+from schemas.money_schema import MoneySchema
 from schemas.account_schemas.position_schema import PositionSchema
 
 
