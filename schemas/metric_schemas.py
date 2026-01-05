@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
+from schemas.converters import formatted_datetime
+
 
 @dataclass
 class QuotaUsageSchema:
@@ -17,7 +19,7 @@ class QuotaUsageSchema:
             name=quota_usage_dict['name'],
             limit=int(quota_usage_dict['limit']),
             remaining=int(quota_usage_dict['remaining']),
-            reset_time=datetime.strptime(quota_usage_dict['reset_time'], "%Y-%m-%dT%H:%M:%SZ")
+            reset_time=formatted_datetime(quota_usage_dict['reset_time'])
         )
 
 

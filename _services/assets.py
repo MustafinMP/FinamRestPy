@@ -5,6 +5,7 @@ import requests
 from _services.base_service import BaseService
 from schemas.asset_schemas import ExchangeSchema, SessionSchema, AssetSchema, FullAssetSchema
 from schemas.asset_schemas.option_schema import OptionSchema
+from schemas.converters import formatted_datetime
 
 
 class AssetService(BaseService):
@@ -19,7 +20,7 @@ class AssetService(BaseService):
         url = f'{self._base_url}assets/clock'
         response = requests.get(url, headers=self._headers())
         if response.status_code == 200:
-            return datetime.strptime(response.json()['timestamp'], "%Y-%m-%dT%H:%M:%SZ")
+            return formatted_datetime(response.json()['timestamp'])
         return None
 
     def get_exchanges(self) -> list[ExchangeSchema]:

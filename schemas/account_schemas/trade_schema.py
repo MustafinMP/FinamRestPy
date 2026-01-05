@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
+from schemas.converters import formatted_datetime
 from schemas.trade_side import TradeSide
 
 
@@ -25,7 +26,7 @@ class AccountTradeSchema:
             price=float(response_dict['price']['value']),
             size=float(response_dict['size']['value']),
             side=TradeSide.LONG if response_dict['side'] == 'SIDE_BUY' else TradeSide.SHORT,
-            timestamp=datetime.strptime(response_dict['timestamp'], '%Y-%m-%dT%H:%M:%SZ'),
+            timestamp=formatted_datetime(response_dict['timestamp']),
             order_id=response_dict['order_id'],
             account_id=response_dict['account_id']
         )

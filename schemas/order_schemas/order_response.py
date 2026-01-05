@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
+from schemas.converters import formatted_datetime
 from schemas.order_schemas.order import OrderSchema
 
 
@@ -21,5 +22,5 @@ class OrderResponse:
             exec_id=order_dict['exec_id'],
             status=order_dict['order_status'],
             order=OrderSchema.from_dict(order_dict['order_schemas']),
-            transact_at=datetime.strptime(order_dict['transact_at'], "%Y-%m-%dT%H:%M:%S.%fZ")
+            transact_at=formatted_datetime(order_dict['transact_at'])
         )

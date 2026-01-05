@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
+from schemas.converters import formatted_datetime
+
 
 @dataclass
 class QuoteOptionSchema:
@@ -54,7 +56,7 @@ class QuoteSchema:
         quote = quote_dict['quote']
         return QuoteSchema(
             symbol=quote_dict['symbol'],
-            timestamp=datetime.strptime(quote['timestamp'], "%Y-%m-%dT%H:%M:%SZ"),
+            timestamp=formatted_datetime(quote['timestamp']),
             ask=float(quote['ask']['value']),
             ask_size=float(quote['ask_size']['value']),
             bid=float(quote['bid']['value']),

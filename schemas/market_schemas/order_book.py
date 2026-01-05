@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 
+from schemas.converters import formatted_datetime
+
 
 class Action(Enum):
     ACTION_UNSPECIFIED = 0  # Действие не указано
@@ -38,7 +40,7 @@ class RowSchema:
             buy_size=float(row_dict['buy_size']['value']),
             action=Action.from_str(row_dict['action']),
             mpid=row_dict['mpid'],
-            timestamp=datetime.strptime(row_dict['timestamp'], "%Y-%m-%dT%H:%M:%SZ")
+            timestamp=formatted_datetime(row_dict['timestamp'])
         )
 
 
