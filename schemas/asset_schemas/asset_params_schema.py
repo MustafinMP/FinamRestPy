@@ -52,7 +52,7 @@ class ShortableStatus(Enum):
 class PriceType(Enum):
     UNKNOWN = 0  # Неизвестно
     POSITIVE = 1  # Положительная.Больше нуля
-    NON_NEGATIVE = 2  # Неотрицательная.Больше или равна нулю
+    NON_NEGATIVE = 2  # Неотрицательная. Больше или равна нулю
     ANY = 3  # Любая
 
     @classmethod

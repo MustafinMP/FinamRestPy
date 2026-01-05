@@ -31,6 +31,11 @@ class Finam:
 
     def set_account(self, account_id: str) -> None:
         self._account_id = account_id
+        self.account.set_account(account_id)
+        self.instruments.set_account(account_id)
+        self.orders.set_account(account_id)
+        self.market.set_account(account_id)
+        self.metrics.set_account(account_id)
 
     def _headers(self):
         return {"Authorization": f"{self._jwt_token}", 'Content-Type': 'application/json', 'Accept': 'application/json'}
