@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
+from schemas.converters import formatted_datetime
 from schemas.trade_side import TradeSide
 
 
@@ -22,7 +23,7 @@ class TradeSchema:
             symbol=trade_dict['symbol'],
             trade_id=trade_dict['trade_id'],
             mpid=trade_dict['mpid'],
-            timestamp=datetime.strptime(trade_dict['timestamp'], "%Y-%m-%dT%H:%M:%SZ"),
+            timestamp=formatted_datetime(trade_dict['timestamp']),
             price=float(trade_dict['price']['value']),
             size=float(trade_dict['size']['value']),
             side=TradeSide.from_str(trade_dict['side'])

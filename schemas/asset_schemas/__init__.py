@@ -1,2 +1,3 @@
+from schemas.asset_schemas.asset_schema import AssetSchema, FullAssetSchema
 from schemas.asset_schemas.exchange_schema import ExchangeSchema
 from schemas.asset_schemas.session_schema import SessionSchema
