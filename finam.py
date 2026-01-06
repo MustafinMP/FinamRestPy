@@ -1,8 +1,8 @@
-import asyncio
 import json
 import threading
+import time
 
-import aiohttp
+import requests
 
 from _services.account import AccountService
 from _services.assets import AssetService
@@ -29,34 +29,30 @@ class Finam:
         self.metrics = MetricsService(self._jwt_token, self._account_id, self._base_url)
 
         self._jwt_thread = threading.Thread(
-            target=asyncio.run,
-            args=(self._update_jwt_token(), ),
+            target=self._update_jwt_token,
             daemon=True
         )
         self._jwt_thread.start()
 
-    async def _update_jwt_token(self) -> None:
-        session = aiohttp.ClientSession()
-        period_in_seconds = 5 #14 * 60 + 30
+    def _update_jwt_token(self) -> None:
+        period_in_seconds = 14 * 60 + 30
 
-        try:
-            while True:
-                with self._lock:
-                    async with session.post(
-                            f'{self._base_url}sessions',
-                            data=json.dumps({'secret': self._user_token}),
-                            headers={'Content-Type': 'application/json', 'Accept': 'application/json'}
-                    ) as response:
-                        self._jwt_token = (await response.json())['token']
-                        self.account._update_jwt(self._jwt_token)
-                        self.instruments._update_jwt(self._jwt_token)
-                        self.orders._update_jwt(self._jwt_token)
-                        self.market._update_jwt(self._jwt_token)
-                        self.metrics._update_jwt(self._jwt_token)
+        while True:
+            with self._lock:
+                response = requests.post(
+                    f'{self._base_url}sessions',
+                    data=json.dumps({'secret': self._user_token}),
+                    headers={'Content-Type': 'application/json', 'Accept': 'application/json'}
+                )
+                self._jwt_token = response.json()['token']
+                print('updated')
+                self.account._update_jwt(self._jwt_token)
+                self.instruments._update_jwt(self._jwt_token)
+                self.orders._update_jwt(self._jwt_token)
+                self.market._update_jwt(self._jwt_token)
+                self.metrics._update_jwt(self._jwt_token)
 
-                await asyncio.sleep(period_in_seconds)
-        finally:
-            await session.close()
+            time.sleep(period_in_seconds)
 
     def set_account(self, account_id: str) -> None:
         self._account_id = account_id
