@@ -22,7 +22,7 @@ _В разработке_
 `finam = Finam(<your_finam_token>, <your_account_id>)`
 
 Инструкция, как получить токен и узнать ID аккаунта(-ов), 
-есть на сайте Finam Trade API(https://tradeapi.finam.ru/docs/about/)
+есть на сайте Finam Trade API (https://tradeapi.finam.ru/docs/about/)
 
 Для смены аккаунта используйте следующий код, подставив в него ID нужного аккаунта:
 
