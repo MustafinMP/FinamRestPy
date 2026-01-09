@@ -13,45 +13,50 @@ from _services.order import OrderService
 
 class Finam:
     _base_url = 'https://api.finam.ru/v1/'
+    _jwt_token_dict = dict()
+    _lock = threading.Lock()
 
     def __init__(self, user_token: str, account_id: str):
         super().__init__()
         self._account_id = account_id
         self._user_token = user_token
-        self._jwt_token = None
 
-        self._lock = threading.Lock()
+        self.account = AccountService(self._base_url, self._account_id)
+        self.instruments = AssetService(self._base_url, self._account_id)
+        self.orders = OrderService(self._base_url, self._account_id)
+        self.market = MarketService(self._base_url, self._account_id)
+        self.metrics = MetricsService(self._base_url, self._account_id)
 
-        self.account = AccountService(self._jwt_token, self._account_id, self._base_url)
-        self.instruments = AssetService(self._jwt_token, self._account_id, self._base_url)
-        self.orders = OrderService(self._jwt_token, self._account_id, self._base_url)
-        self.market = MarketService(self._jwt_token, self._account_id, self._base_url)
-        self.metrics = MetricsService(self._jwt_token, self._account_id, self._base_url)
-
+        self._update_jwt_token()
         self._jwt_thread = threading.Thread(
-            target=self._update_jwt_token,
+            target=self._update_jwt_token_loop,
             daemon=True
         )
         self._jwt_thread.start()
 
+    def _set_jwt_token(self, token: str) -> None:
+        self._jwt_token_dict[self._user_token] = token
+
     def _update_jwt_token(self) -> None:
+        with Finam._lock:
+            response = requests.post(
+                f'{self._base_url}sessions',
+                data=json.dumps({'secret': self._user_token}),
+                headers={'Content-Type': 'application/json', 'Accept': 'application/json'}
+            )
+            token = response.json()['token']
+            self._set_jwt_token(token)
+            self.account._set_jwt_token(token)
+            self.instruments._set_jwt_token(token)
+            self.orders._set_jwt_token(token)
+            self.market._set_jwt_token(token)
+            self.metrics._set_jwt_token(token)
+
+    def _update_jwt_token_loop(self) -> None:
         period_in_seconds = 14 * 60 + 30
 
         while True:
-            with self._lock:
-                response = requests.post(
-                    f'{self._base_url}sessions',
-                    data=json.dumps({'secret': self._user_token}),
-                    headers={'Content-Type': 'application/json', 'Accept': 'application/json'}
-                )
-                self._jwt_token = response.json()['token']
-                print('updated')
-                self.account._update_jwt(self._jwt_token)
-                self.instruments._update_jwt(self._jwt_token)
-                self.orders._update_jwt(self._jwt_token)
-                self.market._update_jwt(self._jwt_token)
-                self.metrics._update_jwt(self._jwt_token)
-
+            self._update_jwt_token()
             time.sleep(period_in_seconds)
 
     def set_account(self, account_id: str) -> None:
@@ -63,7 +68,8 @@ class Finam:
         self.metrics.set_account(account_id)
 
     def _headers(self):
-        return {"Authorization": f"{self._jwt_token}", 'Content-Type': 'application/json', 'Accept': 'application/json'}
+        return {"Authorization": f"{self._jwt_token_dict[self._user_token]}", 'Content-Type': 'application/json',
+                'Accept': 'application/json'}
 
     def __del__(self):
         self._jwt_thread.join()

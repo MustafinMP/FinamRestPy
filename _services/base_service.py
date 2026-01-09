@@ -1,8 +1,10 @@
 class BaseService:
-    def __init__(self, jwt_token: str, account_id: str, base_url: str):
-        self._account_id = account_id
-        self._jwt_token = jwt_token
+    _jwt_token = None
+    _base_url = ''
+
+    def __init__(self, base_url: str, account_id: str):
         self._base_url = base_url
+        self._account_id = account_id
 
     def set_account(self, account_id: str) -> None:
         self._account_id = account_id
@@ -10,5 +12,6 @@ class BaseService:
     def _headers(self) -> dict:
         return {"Authorization": f"{self._jwt_token}", 'Content-Type': 'application/json', 'Accept': 'application/json'}
 
-    def _update_jwt(self, new_jwt_token: str) -> None:
-        self._jwt_token = new_jwt_token
+    @classmethod
+    def _set_jwt_token(cls, jwt_token: str) -> None:
+        cls._jwt_token = jwt_token
