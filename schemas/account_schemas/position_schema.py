@@ -16,7 +16,7 @@ class PositionSchema:
     def from_dict(cls, response_dict: dict) -> PositionSchema:
         return PositionSchema(
             symbol=str(response_dict['symbol']),
-            quantity=int(response_dict['quantity']['value']),
+            quantity=int(float(response_dict['quantity']['value'])),
             average_price=float(response_dict['average_price']['value']),
             current_price=float(response_dict['current_price']['value']),
             daily_pnl=float(response_dict['daily_pnl']['value']),
