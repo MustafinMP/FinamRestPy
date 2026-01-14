@@ -1,6 +1,6 @@
-# FinamRest
+# FinamRestPy
 
-FinamRest - библиотека-обертка над Finam Trade API (REST API) (https://tradeapi.finam.ru/).
+FinamRestPy - библиотека-обертка над Finam Trade API (REST API) (https://tradeapi.finam.ru/).
 Основная цель библиотеки - обеспечить подключение Finam Trade API к коду на Python так,
 чтобы ее функции по содержанию были похожи на оригинальные запросы Finam REST API, а у 
 разработчиков не было необходимости разбираться в особенностях работы библиотеки.
@@ -19,18 +19,21 @@ _В разработке_
 
 Для начала работы необходимо инициализировать модуль:
 
-`finam = Finam(<your_finam_token>, <your_account_id>)`
+```python
+finam = Finam('your_finam_token', 'your_account_id')
+```
 
 Инструкция, как получить токен и узнать ID аккаунта(-ов), 
 есть на сайте Finam Trade API (https://tradeapi.finam.ru/docs/about/)
 
 Для смены аккаунта используйте следующий код, подставив в него ID нужного аккаунта:
 
-`finam.set_account(<your_other_account_id>)`
+```python
+finam.set_account('your_other_account_id')
+```
 
 Ниже представлен пример запроса для получения информации об аккаунте:
 
-`finam.account.get_account()`
-
-Имена и структура методов соответствуют их именам в Finam Trade API.
-Ответы от API преобразуются в типы данных Python.
+```python
+finam.account.get_account()
+```

@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finam-rest-py"
+version = "0.1.0"
+description = "A Python library for the Finam Trade API."
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Maksim Mustafin", email = "mustafinmp@yandex.ru"},
+]
+keywords = ["API", "rest api", "Finam", "Finam Trade API", "trading api", "finam-rest-py", "FinamRestPy"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Typing :: Typed",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "requests>=2.25.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/MustafinMP/FinamRest"
+Repository = "https://github.com/MustafinMP/FinamRest"
+Bug-Tracker = "https://github.com/MustafinMP/FinamRest/issues"
+#Documentation = "https://username.github.io/repo"
+Documentation = "https://github.com/MustafinMP/FinamRest"

@@ -1,0 +1,5 @@
+from finam_rest.schemas.asset_schemas.asset_params_schema import AssetParamsSchema
+from finam_rest.schemas.asset_schemas.asset_schema import AssetSchema, FullAssetSchema
+from finam_rest.schemas.asset_schemas.exchange_schema import ExchangeSchema
+from finam_rest.schemas.asset_schemas.option_schema import OptionSchema
+from finam_rest.schemas.asset_schemas.session_schema import SessionSchema
