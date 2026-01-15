@@ -29,7 +29,7 @@ class Finam:
         self.account = AccountService(self)
         self.instruments = AssetService(self._base_url, self._account_id)
         self.orders = OrderService(self._base_url, self._account_id)
-        self.market = MarketService(self._base_url, self._account_id)
+        self.market = MarketService(self)
         self.metrics = MetricsService(self)
 
         self._update_jwt_token()
@@ -53,7 +53,6 @@ class Finam:
             self._set_jwt_token(token)
             self.instruments._set_jwt_token(token)
             self.orders._set_jwt_token(token)
-            self.market._set_jwt_token(token)
 
     def _update_jwt_token_loop(self) -> None:
         period_in_seconds = 14 * 60 + 30
@@ -76,7 +75,6 @@ class Finam:
         self._account_id = account_id
         self.instruments.set_account(account_id)
         self.orders.set_account(account_id)
-        self.market.set_account(account_id)
 
     def get_account(self) -> str:
         return self._account_id

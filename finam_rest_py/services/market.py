@@ -1,15 +1,12 @@
 from datetime import datetime
 
-import requests
-
 from finam_rest_py.exceptions import ResponseFailureException
 from finam_rest_py.models import Bar, Trade, TimeFrame, Quote, OrderBook
-from finam_rest_py.services.base_service import BaseService
+from finam_rest_py.services.async_base_service import AsyncBaseService
 
 
-class MarketService(BaseService):
-    def get_bars(self, symbol: str, timeframe: TimeFrame, start_time: datetime, end_time: datetime) -> list[Bar]:
-        url = f'{self._base_url}instruments/{symbol}/bars'
+class MarketService(AsyncBaseService):
+    async def get_bars(self, symbol: str, timeframe: TimeFrame, start_time: datetime, end_time: datetime) -> list[Bar]:
         if end_time - timeframe.max_deep() > start_time:
             start_time = end_time - timeframe.max_deep()
         params = {
@@ -18,29 +15,25 @@ class MarketService(BaseService):
             'interval.start_time': start_time.isoformat() + 'Z',
             'interval.end_time': end_time.isoformat() + 'Z'
         }
+        async with self._session.get(f'instruments/{symbol}/bars', params=params) as response:
+            if response.status == 200:
+                return [Bar.from_dict(bar) for bar in (await response.json())['bars']]
+            raise ResponseFailureException
 
-        response = requests.get(url, headers=self._headers(), params=params)
-        if response.status_code == 200:
-            return [Bar.from_dict(bar) for bar in response.json()['bars']]
-        raise ResponseFailureException
+    async def get_last_quote(self, symbol: str) -> Quote:
+        async with self._session.get(f'instruments/{symbol}/quotes/latest', params={'symbol': symbol}) as response:
+            if response.status == 200:
+                return Quote.from_dict(await response.json())
+            raise ResponseFailureException
 
-    def get_last_quote(self, symbol: str) -> Quote:
-        url = f'{self._base_url}instruments/{symbol}/quotes/latest'
-        response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
-        if response.status_code == 200:
-            return Quote.from_dict(response.json())
-        raise ResponseFailureException
+    async def get_latest_trades(self, symbol: str) -> list[Trade]:
+        async with self._session.get(f'instruments/{symbol}/trades/latest', params={'symbol': symbol}) as response:
+            if response.status == 200:
+                return [Trade.from_dict(t) for t in (await response.json())['trades']]
+            raise ResponseFailureException
 
-    def get_latest_trades(self, symbol: str) -> list[Trade]:
-        url = f'{self._base_url}instruments/{symbol}/trades/latest'
-        response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
-        if response.status_code == 200:
-            return [Trade.from_dict(t) for t in response.json()['trades']]
-        raise ResponseFailureException
-
-    def get_order_book(self, symbol: str) -> OrderBook:
-        url = f'{self._base_url}instruments/{symbol}/orderbook'
-        response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
-        if response.status_code == 200:
-            return OrderBook.from_dict(response.json())
-        raise ResponseFailureException
+    async def get_order_book(self, symbol: str) -> OrderBook:
+        async with self._session.get(f'instruments/{symbol}/orderbook', params={'symbol': symbol}) as response:
+            if response.status == 200:
+                return OrderBook.from_dict(await response.json())
+            raise ResponseFailureException
