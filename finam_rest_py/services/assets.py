@@ -1,6 +1,6 @@
 from datetime import datetime
 
-import requests
+import requests, httpx
 
 from finam_rest_py.exceptions import ResponseFailureException
 from finam_rest_py.services.base_service import BaseService
@@ -11,7 +11,9 @@ from finam_rest_py.models.converters import formatted_datetime
 class AssetService(BaseService):
     def get_assets(self) -> list[Asset]:
         url = f'{self._base_url}assets'
-        response = requests.get(url, headers=self._headers())
+        #response = requests.get(url, headers=self._headers())
+        with httpx.Client(http2=True) as client:  # временное решение для http2
+            response = client.get(url, headers=self._headers())
         if response.status_code == 200:
             return [Asset.from_dict(a) for a in response.json()['assets']]
         raise ResponseFailureException
