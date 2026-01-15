@@ -14,7 +14,6 @@ class ScheduleSession:
 
     @classmethod
     def from_dict(cls, session_dict: dict) -> ScheduleSession:
-        print(session_dict)
         return ScheduleSession(
             type=session_dict['type'],
             open_time=formatted_datetime(session_dict['interval']['start_time']),

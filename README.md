@@ -20,6 +20,8 @@ _В разработке_
 Для начала работы необходимо инициализировать модуль:
 
 ```python
+from finam_rest_py import Finam
+
 finam = Finam('your_finam_token', 'your_account_id')
 ```
 
@@ -29,11 +31,20 @@ finam = Finam('your_finam_token', 'your_account_id')
 Для смены аккаунта используйте следующий код, подставив в него ID нужного аккаунта:
 
 ```python
+from finam_rest_py import Finam
+
+finam = Finam('your_finam_token', 'your_account_id')
 finam.set_account('your_other_account_id')
 ```
 
 Ниже представлен пример запроса для получения информации об аккаунте:
 
 ```python
+from finam_rest_py import Finam
+
+finam = Finam('your_finam_token', 'your_account_id')
 finam.account.get_account()
 ```
+
+
+Больше примеров использования можно увидеть в папке examples
