@@ -1,5 +1,6 @@
 import requests
 
+from finam_rest.exceptions import ResponseFailureException
 from finam_rest.services.base_service import BaseService
 from finam_rest.models import QuotaUsageMetrics
 
@@ -10,4 +11,4 @@ class MetricsService(BaseService):
         response = requests.get(url, headers=self._headers())
         if response.status_code == 200:
             return QuotaUsageMetrics.from_dict(response.json())
-        return None
+        raise ResponseFailureException

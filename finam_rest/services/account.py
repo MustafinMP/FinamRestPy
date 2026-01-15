@@ -2,6 +2,7 @@ from datetime import datetime
 
 import requests
 
+from finam_rest.exceptions import ResponseFailureException
 from finam_rest.services.base_service import BaseService
 from finam_rest.models import Account, AccountTrade, Transaction
 
@@ -12,7 +13,7 @@ class AccountService(BaseService):
         response = requests.get(url, headers=self._headers())
         if response.status_code == 200:
             return Account.from_dict(response.json())
-        return None
+        raise ResponseFailureException
 
     def get_trades(self, end_time: datetime, start_time: datetime = None, limit: int = None) -> list[AccountTrade]:
         url = f'{self._base_url}accounts/{self._account_id}/trades'
@@ -25,7 +26,7 @@ class AccountService(BaseService):
         response = requests.get(url, params=params, headers=self._headers())
         if response.status_code == 200:
             return [AccountTrade.from_dict(t) for t in response.json()['trades']]
-        return None
+        raise ResponseFailureException
 
     def transactions(self, end_time: datetime, start_time: datetime = None, limit: int = None) -> list[Transaction]:
         url = f'{self._base_url}accounts/{self._account_id}/transactions'
@@ -38,4 +39,4 @@ class AccountService(BaseService):
         response = requests.get(url, params=params, headers=self._headers())
         if response.status_code == 200:
             return [Transaction.from_dict(t) for t in response.json()['transactions']]
-        return None
+        raise ResponseFailureException

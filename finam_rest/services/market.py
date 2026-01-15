@@ -2,6 +2,7 @@ from datetime import datetime
 
 import requests
 
+from finam_rest.exceptions import ResponseFailureException
 from finam_rest.models import Bar, Trade, TimeFrame, Quote, OrderBook
 from finam_rest.services.base_service import BaseService
 
@@ -21,26 +22,25 @@ class MarketService(BaseService):
         response = requests.get(url, headers=self._headers(), params=params)
         if response.status_code == 200:
             return [Bar.from_dict(bar) for bar in response.json()['bars']]
-        print(response, response.reason, response.text)
-        return None
+        raise ResponseFailureException
 
     def get_last_quote(self, symbol: str) -> Quote:
         url = f'{self._base_url}instruments/{symbol}/quotes/latest'
         response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
         if response.status_code == 200:
             return Quote.from_dict(response.json())
-        return None
+        raise ResponseFailureException
 
     def get_latest_trades(self, symbol: str) -> list[Trade]:
         url = f'{self._base_url}instruments/{symbol}/trades/latest'
         response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
         if response.status_code == 200:
             return [Trade.from_dict(t) for t in response.json()['trades']]
-        return None
+        raise ResponseFailureException
 
     def get_order_book(self, symbol: str) -> OrderBook:
         url = f'{self._base_url}instruments/{symbol}/orderbook'
         response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
         if response.status_code == 200:
             return OrderBook.from_dict(response.json())
-        return None
+        raise ResponseFailureException

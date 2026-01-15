@@ -2,6 +2,7 @@ from datetime import datetime
 
 import requests
 
+from finam_rest.exceptions import ResponseFailureException
 from finam_rest.services.base_service import BaseService
 from finam_rest.models import Exchange, ScheduleSession, Asset, FullAsset, Option, AssetParams
 from finam_rest.models.converters import formatted_datetime
@@ -13,29 +14,28 @@ class AssetService(BaseService):
         response = requests.get(url, headers=self._headers())
         if response.status_code == 200:
             return [Asset.from_dict(a) for a in response.json()['assets']]
-        print(response, response.reason)
-        return None
+        raise ResponseFailureException
 
     def get_clock(self) -> datetime:
         url = f'{self._base_url}assets/clock'
         response = requests.get(url, headers=self._headers())
         if response.status_code == 200:
             return formatted_datetime(response.json()['timestamp'])
-        return None
+        raise ResponseFailureException
 
     def get_exchanges(self) -> list[Exchange]:
         url = f'{self._base_url}exchanges'
         response = requests.get(url, headers=self._headers())
         if response.status_code == 200:
             return [Exchange.from_dict(e) for e in response.json()['exchanges']]
-        return None
+        raise ResponseFailureException
 
     def get_asset(self, symbol: str) -> FullAsset:
         url = f'{self._base_url}assets/{symbol}'
         response = requests.get(url, headers=self._headers(), params={'symbol': symbol, 'account_id': self._account_id})
         if response.status_code == 200:
             return FullAsset.from_dict(response.json())
-        return None
+        raise ResponseFailureException
 
     def get_asset_params(self, symbol: str, account_id: str = None):
         url = f'{self._base_url}assets/{symbol}/params'
@@ -43,7 +43,7 @@ class AssetService(BaseService):
         response = requests.get(url, headers=self._headers(), params=params)
         if response.status_code == 200:
             return AssetParams.from_dict(response.json())
-        return None
+        raise ResponseFailureException
 
     def get_options_chain(self, underlying_symbol: str,
                           root: str = None, expiration_date: datetime = None) -> list[Option]:
@@ -58,11 +58,11 @@ class AssetService(BaseService):
         response = requests.get(url, headers=self._headers(), params=params)
         if response.status_code == 200:
             return [Option.from_dict(op) for op in response.json()['options']]
-        return None
+        raise ResponseFailureException
 
     def get_schedule(self, symbol: str) -> list[ScheduleSession]:
         url = f'{self._base_url}assets/{symbol}/schedule'
         response = requests.get(url, headers=self._headers(), params={'symbol': symbol})
         if response.status_code == 200:
             return [ScheduleSession.from_dict(s) for s in response.json()['sessions']]
-        return None
+        raise ResponseFailureException
