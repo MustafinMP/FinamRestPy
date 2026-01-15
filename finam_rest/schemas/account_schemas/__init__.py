@@ -1,4 +1,0 @@
-from finam_rest.schemas.account_schemas.account_schema import AccountSchema
-from finam_rest.schemas.account_schemas.position_schema import PositionSchema
-from finam_rest.schemas.account_schemas.trade_schema import AccountTradeSchema
-from finam_rest.schemas.account_schemas.transaction_schema import TransactionSchema

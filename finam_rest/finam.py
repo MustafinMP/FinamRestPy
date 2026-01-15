@@ -4,11 +4,11 @@ import time
 
 import requests
 
-from finam_rest._services.account import AccountService
-from finam_rest._services.assets import AssetService
-from finam_rest._services.market import MarketService
-from finam_rest._services.metrics import MetricsService
-from finam_rest._services.order import OrderService
+from finam_rest.services.account import AccountService
+from finam_rest.services.assets import AssetService
+from finam_rest.services.market import MarketService
+from finam_rest.services.metrics import MetricsService
+from finam_rest.services.order import OrderService
 
 
 class Finam:
