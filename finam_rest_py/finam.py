@@ -1,6 +1,7 @@
 import asyncio
 import json
 import threading
+import time
 from typing import Optional
 
 import httpx
@@ -29,30 +30,29 @@ class Finam:
 
         self._session: Optional[httpx.AsyncClient] = None
 
-        asyncio.run(self._refresh_jwt_token())
+        self._refresh_jwt_token()
         self._refresh_token_thread = threading.Thread(
-            target=asyncio.run,
-            args=(self._refresh_jwt_token_loop(),),
+            target=self._refresh_jwt_token_loop,
             daemon=True
         )
         self._refresh_token_thread.start()
 
-    async def _refresh_jwt_token(self) -> None:
+    def _refresh_jwt_token(self) -> None:
         with Finam._lock:
-            async with httpx.AsyncClient(
+            with httpx.Client(
                     base_url=self._base_url,
                     headers={'Content-Type': 'application/json', 'Accept': 'application/json'},
                     timeout=30
             ) as session:
-                response = await session.post(f'sessions', data=json.dumps({'secret': self._user_token}))
+                response = session.post(f'sessions', data=json.dumps({'secret': self._user_token}))
                 self._jwt_token_dict[self._user_token] = response.json()['token']
 
-    async def _refresh_jwt_token_loop(self) -> None:
+    def _refresh_jwt_token_loop(self) -> None:
         period_in_seconds = 14 * 60 + 30
 
         while True:
-            await self._refresh_jwt_token()
-            await asyncio.sleep(period_in_seconds)
+            self._refresh_jwt_token()
+            time.sleep(period_in_seconds)
 
     def _get_session(self) -> httpx.AsyncClient:
         """Получение или создание сессии"""
