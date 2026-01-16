@@ -59,7 +59,7 @@ class Finam:
         if self._session is None or self._session.is_closed:
             self._session = httpx.AsyncClient(
                 base_url=self._base_url,
-                timeout=30.0,
+                timeout=30,
                 headers=self._headers(),
                 http2=True,
             )

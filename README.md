@@ -15,7 +15,9 @@ FinamRestPy - асинхронная библиотека-обертка над 
 
 ## Установка
 
-_В разработке_
+```shell
+pip install git+https://github.com/MustafinMP/FinamRestPy.git
+```
 
 ## Использование
 
