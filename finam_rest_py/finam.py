@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import asyncio
 import json
 import threading
-import time
 from typing import Optional
 
 import httpx
@@ -30,29 +31,31 @@ class Finam:
 
         self._session: Optional[httpx.AsyncClient] = None
 
-        self._refresh_jwt_token()
-        self._refresh_token_thread = threading.Thread(
-            target=self._refresh_jwt_token_loop,
-            daemon=True
-        )
-        self._refresh_token_thread.start()
+        self._refresh_token_task = None
 
-    def _refresh_jwt_token(self) -> None:
-        with Finam._lock:
-            with httpx.Client(
-                    base_url=self._base_url,
-                    headers={'Content-Type': 'application/json', 'Accept': 'application/json'},
-                    timeout=30
-            ) as session:
-                response = session.post(f'sessions', data=json.dumps({'secret': self._user_token}))
+    @classmethod
+    async def create(cls, user_token: str, account_id: str) -> Finam:
+        finam = Finam(user_token, account_id)
+        await finam._refresh_jwt_token()
+        finam._refresh_token_task = asyncio.create_task(finam._refresh_jwt_token_loop())
+        return finam
+
+    async def _refresh_jwt_token(self) -> None:
+        async with httpx.AsyncClient(
+                base_url=self._base_url,
+                headers={'Content-Type': 'application/json', 'Accept': 'application/json'},
+                timeout=30
+        ) as session:
+            with Finam._lock:
+                response = await session.post(f'sessions', data=json.dumps({'secret': self._user_token}))
                 self._jwt_token_dict[self._user_token] = response.json()['token']
 
-    def _refresh_jwt_token_loop(self) -> None:
+    async def _refresh_jwt_token_loop(self) -> None:
         period_in_seconds = 14 * 60 + 30
 
         while True:
-            self._refresh_jwt_token()
-            time.sleep(period_in_seconds)
+            await self._refresh_jwt_token()
+            await asyncio.sleep(period_in_seconds)
 
     def _get_session(self) -> httpx.AsyncClient:
         """Получение или создание сессии"""
@@ -66,16 +69,13 @@ class Finam:
         return self._session
 
     def _headers(self):
-        return {"Authorization": f"{self._jwt_token_dict[self._user_token]}",
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'}
+        with Finam._lock:
+            return {"Authorization": f"{self._jwt_token_dict[self._user_token]}",
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'}
 
     def set_account(self, account_id: str) -> None:
         self._account_id = account_id
 
     def get_account(self) -> str:
         return self._account_id
-
-    def __del__(self):
-        self._refresh_token_thread.join()
-        asyncio.run(self._session.aclose())

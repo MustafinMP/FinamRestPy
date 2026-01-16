@@ -7,7 +7,7 @@ ACCOUNT_ID = 'your_account_id'
 
 
 async def main():
-    finam = Finam(FINAM_TOKEN, ACCOUNT_ID)
+    finam = await Finam.create(FINAM_TOKEN, ACCOUNT_ID)
     symbol = 'YDEX@MISX'
 
     print('Get clock example')

@@ -24,9 +24,10 @@ pip install git+https://github.com/MustafinMP/FinamRestPy.git
 Для начала работы необходимо инициализировать модуль:
 
 ```python
+import asyncio
 from finam_rest_py import Finam
 
-finam = Finam('your_finam_token', 'your_account_id')
+finam = asyncio.run(Finam.create('your_finam_token', 'your_account_id'))
 ```
 
 Инструкция, как получить токен и узнать ID аккаунта(-ов),
@@ -35,9 +36,10 @@ finam = Finam('your_finam_token', 'your_account_id')
 Для смены аккаунта используйте следующий код, подставив в него ID нужного аккаунта:
 
 ```python
+import asyncio
 from finam_rest_py import Finam
 
-finam = Finam('your_finam_token', 'your_account_id')
+finam = asyncio.run(Finam.create('your_finam_token', 'your_account_id'))
 finam.set_account('your_other_account_id')
 ```
 
@@ -49,7 +51,7 @@ from finam_rest_py import Finam
 
 
 async def main():
-    finam = Finam('your_finam_token', 'your_account_id')
+    finam = await Finam.create('your_finam_token', 'your_account_id')
     account = await finam.account.get_account()
     print(account)
 
