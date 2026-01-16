@@ -18,17 +18,16 @@ class Finam:
     _lock = threading.Lock()
 
     def __init__(self, user_token: str, account_id: str):
-        super().__init__()
-        self._account_id = account_id
-        self._user_token = user_token
-
-        self._session: Optional[httpx.AsyncClient] = None
-
         self.account = AccountService(self)
         self.instruments = AssetService(self)
         self.orders = OrderService(self)
         self.market = MarketService(self)
         self.metrics = MetricsService(self)
+
+        self._account_id = account_id
+        self._user_token = user_token
+
+        self._session: Optional[httpx.AsyncClient] = None
 
         asyncio.run(self._refresh_jwt_token())
         self._refresh_token_thread = threading.Thread(
