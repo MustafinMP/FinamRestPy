@@ -1,17 +1,19 @@
-class BaseService:
-    _jwt_token = None
-    _base_url = ''
+from __future__ import annotations
+from typing import TYPE_CHECKING
 
-    def __init__(self, base_url: str, account_id: str):
-        self._base_url = base_url
-        self._account_id = account_id
 
-    def set_account(self, account_id: str) -> None:
-        self._account_id = account_id
+if TYPE_CHECKING:
+    from finam_rest_py import Finam
 
-    def _headers(self) -> dict:
-        return {"Authorization": f"{self._jwt_token}", 'Content-Type': 'application/json', 'Accept': 'application/json'}
 
-    @classmethod
-    def _set_jwt_token(cls, jwt_token: str) -> None:
-        cls._jwt_token = jwt_token
+class AsyncBaseService:
+    def __init__(self, base_module: Finam):
+        self._base_module = base_module
+
+    @property
+    def _session(self):
+        return self._base_module._get_session()
+
+    @property
+    def _account_id(self):
+        return self._base_module.get_account()

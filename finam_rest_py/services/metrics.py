@@ -1,14 +1,11 @@
-import requests
-
 from finam_rest_py.exceptions import ResponseFailureException
-from finam_rest_py.services.base_service import BaseService
 from finam_rest_py.models import QuotaUsageMetrics
+from finam_rest_py.services.base_service import AsyncBaseService
 
 
-class MetricsService(BaseService):
-    def get_usage_metrics(self) -> QuotaUsageMetrics:
-        url = f'{self._base_url}usage'
-        response = requests.get(url, headers=self._headers())
+class MetricsService(AsyncBaseService):
+    async def get_usage_metrics(self) -> QuotaUsageMetrics:
+        response = await self._session.get(f'usage')
         if response.status_code == 200:
             return QuotaUsageMetrics.from_dict(response.json())
         raise ResponseFailureException

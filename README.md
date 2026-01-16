@@ -1,15 +1,17 @@
 # FinamRestPy
 
-FinamRestPy - библиотека-обертка над Finam Trade API (REST API) (https://tradeapi.finam.ru/).
-Основная цель библиотеки - обеспечить подключение Finam Trade API к коду на Python так,
-чтобы ее функции по содержанию были похожи на оригинальные запросы Finam REST API, а у 
-разработчиков не было необходимости разбираться в особенностях работы библиотеки.
+FinamRestPy - асинхронная библиотека-обертка над Finam Trade API (REST API) (https://tradeapi.finam.ru/).
+Основная цель библиотеки - обеспечить подключение Finam Trade API к коду на Python,
+сохранив структуру Finam REST API и сделав код подключения максимально простым
+для разработчиков.
 
 ### Возможности библиотеки
 
-- Подключение к API, автоматическое обновление токена в отдельном потоке
+- Подключение к API, автоматическое обновление токена,
+поддержание одновременно нескольких клиентов на одном токене
 - Выполнение запросов к API и получение ответов
-- работа через типы Python
+- Асинхронность
+- Работа через типы Python, наличие type hints 
 
 ## Установка
 
@@ -25,7 +27,7 @@ from finam_rest_py import Finam
 finam = Finam('your_finam_token', 'your_account_id')
 ```
 
-Инструкция, как получить токен и узнать ID аккаунта(-ов), 
+Инструкция, как получить токен и узнать ID аккаунта(-ов),
 есть на сайте Finam Trade API (https://tradeapi.finam.ru/docs/about/)
 
 Для смены аккаунта используйте следующий код, подставив в него ID нужного аккаунта:
@@ -40,11 +42,17 @@ finam.set_account('your_other_account_id')
 Ниже представлен пример запроса для получения информации об аккаунте:
 
 ```python
+import asyncio
 from finam_rest_py import Finam
 
-finam = Finam('your_finam_token', 'your_account_id')
-finam.account.get_account()
-```
 
+async def main():
+    finam = Finam('your_finam_token', 'your_account_id')
+    account = await finam.account.get_account()
+    print(account)
+
+
+asyncio.run(main())
+```
 
 Больше примеров использования можно увидеть в папке examples
