@@ -1,15 +1,14 @@
 import asyncio
 import json
 import threading
-import time
 from typing import Optional
 
-import aiohttp
+import httpx
 
 from finam_rest_py.services.account import AccountService
 from finam_rest_py.services.assets import AssetService
-from finam_rest_py.services.async_metrics import MetricsService
 from finam_rest_py.services.market import MarketService
+from finam_rest_py.services.metrics import MetricsService
 from finam_rest_py.services.order import OrderService
 
 
@@ -23,7 +22,7 @@ class Finam:
         self._account_id = account_id
         self._user_token = user_token
 
-        self._session: Optional[aiohttp.ClientSession] = None
+        self._session: Optional[httpx.AsyncClient] = None
 
         self.account = AccountService(self)
         self.instruments = AssetService(self)
@@ -31,36 +30,39 @@ class Finam:
         self.market = MarketService(self)
         self.metrics = MetricsService(self)
 
-        asyncio.run(self._update_jwt_token())
-        self._jwt_thread = threading.Thread(target=asyncio.run, args=(self._update_jwt_token_loop(), ), daemon=True)
-        self._jwt_thread.start()
+        asyncio.run(self._refresh_jwt_token())
+        self._refresh_token_thread = threading.Thread(
+            target=asyncio.run,
+            args=(self._refresh_jwt_token_loop(),),
+            daemon=True
+        )
+        self._refresh_token_thread.start()
 
-    async def _update_jwt_token(self) -> None:
+    async def _refresh_jwt_token(self) -> None:
         with Finam._lock:
-            session = aiohttp.ClientSession(
-                base_url=self._base_url,
-                headers={'Content-Type': 'application/json', 'Accept': 'application/json'},
-                timeout=aiohttp.ClientTimeout(total=30)
-            )
-            async with session.post(f'sessions', data=json.dumps({'secret': self._user_token})) as response:
-                token = (await response.json())['token']
-                self._jwt_token_dict[self._user_token] = token
-            await session.close()
+            async with httpx.AsyncClient(
+                    base_url=self._base_url,
+                    headers={'Content-Type': 'application/json', 'Accept': 'application/json'},
+                    timeout=30
+            ) as session:
+                response = await session.post(f'sessions', data=json.dumps({'secret': self._user_token}))
+                self._jwt_token_dict[self._user_token] = response.json()['token']
 
-    async def _update_jwt_token_loop(self) -> None:
+    async def _refresh_jwt_token_loop(self) -> None:
         period_in_seconds = 14 * 60 + 30
 
         while True:
-            await self._update_jwt_token()
-            time.sleep(period_in_seconds)
+            await self._refresh_jwt_token()
+            await asyncio.sleep(period_in_seconds)
 
-    def _get_session(self) -> aiohttp.ClientSession:
+    def _get_session(self) -> httpx.AsyncClient:
         """Получение или создание сессии"""
-        if self._session is None or self._session.closed:
-            self._session = aiohttp.ClientSession(
+        if self._session is None or self._session.is_closed:
+            self._session = httpx.AsyncClient(
                 base_url=self._base_url,
+                timeout=30.0,
                 headers=self._headers(),
-                timeout=aiohttp.ClientTimeout(total=30)
+                http2=True,
             )
         return self._session
 
@@ -76,5 +78,5 @@ class Finam:
         return self._account_id
 
     def __del__(self):
-        self._jwt_thread.join()
-        asyncio.run(self._session.close())
+        self._refresh_token_thread.join()
+        asyncio.run(self._session.aclose())
