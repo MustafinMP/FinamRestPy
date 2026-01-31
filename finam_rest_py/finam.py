@@ -44,7 +44,7 @@ class Finam:
         async with httpx.AsyncClient(
                 base_url=self._base_url,
                 headers={'Content-Type': 'application/json', 'Accept': 'application/json'},
-                timeout=30
+                timeout=10
         ) as session:
             with Finam._lock:
                 response = await session.post(f'sessions', data=json.dumps({'secret': self._user_token}))
