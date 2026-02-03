@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-from finam_rest_py.models.converters import datetime_from_dict
+from finam_rest_py.models.converters import date_from_dict
 
 
 @dataclass
@@ -51,7 +51,7 @@ class FullAsset(Asset):
             decimals=int(asset_dict['decimals']),
             min_step=int(asset_dict['min_step']),
             lot_size=int(float(asset_dict['lot_size']['value'])),
-            expiration_date=datetime_from_dict(
+            expiration_date=date_from_dict(
                 asset_dict['expiration_date']) if 'expiration_date' in asset_dict else None,
             quote_currency=asset_dict.get('quote_currency', None)
         )
