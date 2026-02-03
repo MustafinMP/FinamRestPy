@@ -5,7 +5,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from finam_rest_py.models.converters import datetime_from_dict
+from finam_rest_py.models.converters import date_from_dict
 
 
 class OptionType(Enum):
@@ -40,11 +40,11 @@ class Option:
             symbol=option_dict['symbol'],
             type=OptionType.from_str(option_dict['type']),
             contract_size=float(option_dict['contract_size']['value']),
-            trade_first_day=datetime_from_dict(option_dict['trade_first_day']) if 'trade_first_day' in option_dict.keys()
+            trade_first_day=date_from_dict(option_dict['trade_first_day']) if 'trade_first_day' in option_dict.keys()
             else None,
-            trade_last_day=datetime_from_dict(option_dict['trade_last_day']),
+            trade_last_day=date_from_dict(option_dict['trade_last_day']),
             strike=float(option_dict['strike']['value']),
             multiplier=float(option_dict['multiplier']['value']) if 'multiplier' in option_dict.keys() else None,
-            expiration_first_day=datetime_from_dict(option_dict['expiration_first_day']),
-            expiration_last_day=datetime_from_dict(option_dict['expiration_last_day'])
+            expiration_first_day=date_from_dict(option_dict['expiration_first_day']),
+            expiration_last_day=date_from_dict(option_dict['expiration_last_day'])
         )
