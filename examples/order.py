@@ -14,7 +14,6 @@ async def main():
 
     print('Place order example')
     order = Order(
-        account_id=ACCOUNT_ID,
         symbol=symbol,
         quantity=1,
         side=TradeSide.LONG,  # or TradeSide.BUY
@@ -26,7 +25,6 @@ async def main():
     print(executed_order)
 
     order = Order(
-        account_id=ACCOUNT_ID,
         symbol=symbol,
         quantity=1,
         side=TradeSide.SHORT,  # or TradeSide.SELL
@@ -44,7 +42,6 @@ async def main():
     print('Delete order example')
 
     order = Order(
-        account_id=ACCOUNT_ID,
         symbol=symbol,
         quantity=1,
         side=TradeSide.LONG,

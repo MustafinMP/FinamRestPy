@@ -12,12 +12,12 @@ from finam_rest_py.models.trade_side import TradeSide
 
 @dataclass
 class Order:
-    account_id: str
     symbol: str
     quantity: float
     side: TradeSide
     type: OrderType
     time_in_force: OrderTypeInForce
+    account_id: Optional[str] = None
     limit_price: Optional[float | None] = None
     stop_price: Optional[float | None] = None
     stop_condition: Optional[OrderStopCondition | None] = None

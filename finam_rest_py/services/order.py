@@ -19,6 +19,8 @@ class OrderService(AsyncBaseService):
                                             text=response.text)
 
     async def place_order(self, order: Order) -> FullOrder:
+        if order.account_id is None:
+            order.account_id = self._base_module._account_id
         response = await self._session.post(f'accounts/{self._account_id}/orders', json=order.to_dict())
         if response.status_code == 200:
             return FullOrder.from_dict(response.json())
