@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 
 def date_from_dict(date_dict: dict) -> datetime:
@@ -6,7 +6,4 @@ def date_from_dict(date_dict: dict) -> datetime:
 
 
 def formatted_datetime(timestamp: str) -> datetime:
-    try:
-        return datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
-    except ValueError:
-        return datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+    return datetime.fromisoformat(timestamp.replace('Z', '+00:00')).astimezone().replace(tzinfo=None)

@@ -30,7 +30,7 @@ class AssetService(AsyncBaseService):
 
     async def get_asset(self, symbol: str) -> FullAsset:
         response = await self._session.get(f'assets/{symbol}',
-                                     params={'symbol': symbol, 'account_id': self._account_id})
+                                           params={'symbol': symbol, 'account_id': self._account_id})
         if response.status_code == 200:
             return FullAsset.from_dict(response.json())
         raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
@@ -61,9 +61,17 @@ class AssetService(AsyncBaseService):
         raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
                                             text=response.text)
 
-    async def get_schedule(self, symbol: str) -> list[ScheduleSession]:
+    async def get_schedule(self, symbol: str, only_today=False) -> list[ScheduleSession]:
         response = await self._session.get(f'assets/{symbol}/schedule', params={'symbol': symbol})
         if response.status_code == 200:
-            return [ScheduleSession.from_dict(s) for s in response.json()['sessions']]
+            sessions = sorted(
+                [ScheduleSession.from_dict(s) for s in response.json()['sessions']],
+                key=lambda s: s.open_time
+            )
+            if only_today:
+                today = datetime.now().date()
+                return list(filter(lambda s: s.open_time.date() == today, sessions))
+            else:
+                return sessions
         raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
                                             text=response.text)
