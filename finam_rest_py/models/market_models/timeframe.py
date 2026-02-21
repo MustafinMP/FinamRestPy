@@ -18,6 +18,19 @@ class TimeFrame(Enum):
     TIME_FRAME_W = 20  # Неделя. Глубина данных 365 * 5 дней.
     TIME_FRAME_MN = 21  # Месяц. Глубина данных 365 * 5 дней.
     TIME_FRAME_QR = 22  # Квартал. Глубина данных 365 * 5 дней.
+    UNSPECIFIED = 0  # Таймфрейм не указан
+    M1 = 1  # 1 минута. Глубина данных 7 дней.
+    M5 = 5  # 5 минут. Глубина данных 30 дней.
+    M15 = 9  # 15 минут. Глубина данных 30 дней.
+    M30 = 11  # 30 минут. Глубина данных 30 дней.
+    H1 = 12 # 1 час. Глубина данных 30 дней.
+    H2 = 13  # 2 часа. Глубина данных 30 дней.
+    H4 = 15  # 4 часа. Глубина данных 30 дней.
+    H8 = 17  # 8 часов. Глубина данных 30 дней.
+    D = 19  # День. Глубина данных 365 дней.
+    W = 20  # Неделя. Глубина данных 365 * 5 дней.
+    MN = 21  # Месяц. Глубина данных 365 * 5 дней.
+    QR = 22  # Квартал. Глубина данных 365 * 5 дней.
 
     def max_deep(self) -> timedelta:
         if self.value == 0:
@@ -40,17 +53,17 @@ class TimeFrame(Enum):
     @classmethod
     def from_str(cls, string: str) -> TimeFrame:
         match string:
-            case 'TIME_FRAME_UNSPECIFIED': return cls.TIME_FRAME_UNSPECIFIED
-            case 'TIME_FRAME_M1': return cls.TIME_FRAME_M1
-            case 'TIME_FRAME_M5': return cls.TIME_FRAME_M5
-            case 'TIME_FRAME_M15': return cls.TIME_FRAME_M15
-            case 'TIME_FRAME_M30': return cls.TIME_FRAME_M30
-            case 'TIME_FRAME_H1': return cls.TIME_FRAME_H1
-            case 'TIME_FRAME_H2': return cls.TIME_FRAME_H2
-            case 'TIME_FRAME_H4': return cls.TIME_FRAME_H4
-            case 'TIME_FRAME_H8': return cls.TIME_FRAME_H8
-            case 'TIME_FRAME_D': return cls.TIME_FRAME_D
-            case 'TIME_FRAME_W': return cls.TIME_FRAME_W
-            case 'TIME_FRAME_MN': return cls.TIME_FRAME_MN
-            case 'TIME_FRAME_QR': return cls.TIME_FRAME_QR
-            case _: return cls.TIME_FRAME_UNSPECIFIED
+            case 'TIME_FRAME_UNSPECIFIED', None: return cls.TIME_FRAME_UNSPECIFIED
+            case 'TIME_FRAME_M1', 'M1', 'm1': return cls.TIME_FRAME_M1
+            case 'TIME_FRAME_M5', 'M5', 'm5': return cls.TIME_FRAME_M5
+            case 'TIME_FRAME_M15', 'M15', 'm15': return cls.TIME_FRAME_M15
+            case 'TIME_FRAME_M30', 'M30', 'm30': return cls.TIME_FRAME_M30
+            case 'TIME_FRAME_H1', 'H1', 'h1': return cls.TIME_FRAME_H1
+            case 'TIME_FRAME_H2', 'H2', 'h2': return cls.TIME_FRAME_H2
+            case 'TIME_FRAME_H4', 'H4', 'h4': return cls.TIME_FRAME_H4
+            case 'TIME_FRAME_H8', 'H8', 'h8': return cls.TIME_FRAME_H8
+            case 'TIME_FRAME_D', 'D', 'd': return cls.TIME_FRAME_D
+            case 'TIME_FRAME_W', 'W', 'w': return cls.TIME_FRAME_W
+            case 'TIME_FRAME_MN', 'MN', 'mn': return cls.TIME_FRAME_MN
+            case 'TIME_FRAME_QR', 'QR', 'qr': return cls.TIME_FRAME_QR
+            case _: raise ValueError(f'Invalid timeframe string {string}')

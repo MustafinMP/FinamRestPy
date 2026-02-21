@@ -6,7 +6,13 @@ from finam_rest_py.services.base_service import AsyncBaseService
 
 
 class MarketService(AsyncBaseService):
-    async def get_bars(self, symbol: str, timeframe: TimeFrame, start_time: datetime, end_time: datetime) -> list[Bar]:
+    async def get_bars(self,
+                       symbol: str,
+                       timeframe: TimeFrame | str,
+                       start_time: datetime,
+                       end_time: datetime) -> list[Bar]:
+        if isinstance(timeframe, str):
+
         if end_time - timeframe.max_deep() > start_time:
             start_time = end_time - timeframe.max_deep()
         params = {
