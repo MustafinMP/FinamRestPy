@@ -12,7 +12,7 @@ class MarketService(AsyncBaseService):
                        start_time: datetime,
                        end_time: datetime) -> list[Bar]:
         if isinstance(timeframe, str):
-
+            timeframe = TimeFrame.from_str(timeframe)
         if end_time - timeframe.max_deep() > start_time:
             start_time = end_time - timeframe.max_deep()
         params = {
