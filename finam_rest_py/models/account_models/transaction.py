@@ -50,6 +50,7 @@ class Transaction:
     symbol: str
     change: MoneyModel
     trade: Optional[AccountTrade, None]
+    # такое дублирование поля category было в API, в будущем оно будет убрано из библиотеки (но не факт, что из API тоже)
     transaction_category: TransactionCategory
     transaction_name: str
     change_qty: Optional[float, None]

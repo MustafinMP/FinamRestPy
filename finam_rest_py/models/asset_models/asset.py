@@ -16,6 +16,7 @@ class Asset:
     type: str
     name: str
 
+    @property
     def symbol(self) -> str:
         return f'{self.ticker}@{self.mic}'
 
@@ -33,11 +34,18 @@ class Asset:
 
 @dataclass
 class FullAsset(Asset):
-    decimals: int
-    min_step: int
+    min_price_step: float
     lot_size: float
     expiration_date: Optional[datetime, None]
     quote_currency: Optional[str | None]
+
+    @classmethod
+    def _calculate_min_step_price(cls, min_step: int, decimals: int):
+        return min_step * 10 ** -decimals
+
+    @property
+    def min_lot_price_step(self):
+        return self.min_price_step * self.lot_size
 
     @classmethod
     def from_dict(cls, asset_dict: dict) -> FullAsset:
@@ -48,8 +56,7 @@ class FullAsset(Asset):
             isin=asset_dict['isin'],
             type=asset_dict['type'],
             name=asset_dict['name'],
-            decimals=int(asset_dict['decimals']),
-            min_step=int(asset_dict['min_step']),
+            min_price_step=cls._calculate_min_step_price(int(asset_dict['min_step']), int(asset_dict['decimals'])),
             lot_size=int(float(asset_dict['lot_size']['value'])),
             expiration_date=date_from_dict(
                 asset_dict['expiration_date']) if 'expiration_date' in asset_dict else None,
