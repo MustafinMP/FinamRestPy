@@ -7,6 +7,14 @@ from finam_rest_py.services.base_service import AsyncBaseService
 
 class AccountService(AsyncBaseService):
     async def get_account(self) -> Account:
+        """Получает аккаунт в Finam.
+
+        Returns:
+            Account: аккаунт в Finam.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
         response = await self._session.get(f'accounts/{self._account_id}')
         if response.status_code == 200:
             return Account.from_dict(response.json())
@@ -17,6 +25,19 @@ class AccountService(AsyncBaseService):
                          end_time: datetime,
                          start_time: datetime = None,
                          limit: int = None) -> list[AccountTrade]:
+        """Получает истории по сделкам аккаунта.
+
+        Args:
+            end_time (datetime): конец запрашиваемого периода.
+            start_time (Optional[datetime]): начало запрашиваемого периода.
+            limit (Optional[int]): лимит количества сделок.
+
+        Returns:
+            list[AccountTrade]: список сделок по аккаунту.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
         params = {'interval.end_time': end_time.isoformat() + 'Z'}
         if start_time:
             params['interval.start_time'] = start_time.isoformat() + 'Z'
@@ -33,6 +54,19 @@ class AccountService(AsyncBaseService):
                            end_time: datetime,
                            start_time: datetime = None,
                            limit: int = None) -> list[Transaction]:
+        """Получает список транзакций аккаунта.
+
+        Args:
+            end_time (datetime): конец запрашиваемого периода.
+            start_time (Optional[datetime]): начало запрашиваемого периода.
+            limit (Optional[int]): лимит количества транзакций.
+
+        Returns:
+            list[Transaction]: список транзакций аккаунта.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
         params = {'interval.end_time': end_time.isoformat() + 'Z'}
         if start_time:
             params['interval.start_time'] = start_time.isoformat() + 'Z'

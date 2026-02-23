@@ -25,7 +25,7 @@ class AccountTrade:
             symbol=response_dict['symbol'],
             price=float(response_dict['price']['value']),
             size=float(response_dict['size']['value']),
-            side=TradeSide.LONG if response_dict['side'] == 'SIDE_BUY' else TradeSide.SHORT,
+            side=TradeSide.from_str(response_dict['side']),
             timestamp=formatted_datetime(response_dict['timestamp']),
             order_id=response_dict['order_id'],
             account_id=response_dict['account_id']

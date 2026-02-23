@@ -4,6 +4,7 @@ from datetime import timedelta
 from enum import Enum
 
 
+
 class TimeFrame(Enum):
     TIME_FRAME_UNSPECIFIED = 0  # Таймфрейм не указан
     TIME_FRAME_M1 = 1  # 1 минута. Глубина данных 7 дней.
