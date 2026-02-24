@@ -9,7 +9,7 @@ from finam_rest_py.models.order_models.order import Order
 
 
 @dataclass
-class FullOrder:
+class OrderInfo:
     order_id: str
     exec_id: str
     status: None
@@ -22,8 +22,8 @@ class FullOrder:
     remaining_quantity: Optional[float | None]
 
     @classmethod
-    def from_dict(cls, order_dict: dict) -> FullOrder:
-        return FullOrder(
+    def from_dict(cls, order_dict: dict) -> OrderInfo:
+        return OrderInfo(
             order_id=order_dict['order_id'],
             exec_id=order_dict['exec_id'],
             status=order_dict['status'],

@@ -1,4 +1,4 @@
-from finam_rest_py.models.order_models.full_order import FullOrder
+from finam_rest_py.models.order_models.full_order import OrderInfo
 from finam_rest_py.models.order_models.order import Order
 from finam_rest_py.models.order_models.order_stop_condition import OrderStopCondition
 from finam_rest_py.models.order_models.order_type import OrderType

@@ -11,6 +11,20 @@ class MarketService(AsyncBaseService):
                        timeframe: TimeFrame | str,
                        start_time: datetime,
                        end_time: datetime) -> list[Bar]:
+        """Получает свечи по инструменту в нужном таймфрейме.
+
+        Args:
+            symbol (str): символ инструмента в формате ticker@mic.
+            timeframe (TimeFrame | str):
+            start_time (datetime): начало запрашиваемого периода.
+            end_time (datetime): конец запрашиваемого периода.
+
+        Returns:
+            list[Bar]: список свечей.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
         if isinstance(timeframe, str):
             timeframe = TimeFrame.from_str(timeframe)
         if end_time - timeframe.max_deep() > start_time:
@@ -28,6 +42,17 @@ class MarketService(AsyncBaseService):
                                             text=response.text)
 
     async def get_last_quote(self, symbol: str) -> Quote:
+        """Получает последнюю котировку по инструменту.
+
+        Args:
+            symbol (str): символ инструмента в формате ticker@mic.
+
+        Returns:
+            Quote: последняя котировка по инструменту.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
         response = await self._session.get(f'instruments/{symbol}/quotes/latest', params={'symbol': symbol})
         if response.status_code == 200:
             return Quote.from_dict(response.json())
@@ -35,6 +60,17 @@ class MarketService(AsyncBaseService):
                                             text=response.text)
 
     async def get_latest_trades(self, symbol: str) -> list[Trade]:
+        """Получает данные о последних сделках по инструменту.
+
+        Args:
+            symbol (str): символ инструмента в формате ticker@mic.
+
+        Returns:
+            list[Trade]: список последних сделок.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
         response = await self._session.get(f'instruments/{symbol}/trades/latest', params={'symbol': symbol})
         if response.status_code == 200:
             return [Trade.from_dict(t) for t in response.json()['trades']]
@@ -42,6 +78,17 @@ class MarketService(AsyncBaseService):
                                             text=response.text)
 
     async def get_order_book(self, symbol: str) -> OrderBook:
+        """Получает книгу заявок по инструменту.
+
+        Args:
+            symbol (str): символ инструмента в формате ticker@mic.
+
+        Returns:
+            OrderBook: книга заявок.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
         response = await self._session.get(f'instruments/{symbol}/orderbook', params={'symbol': symbol})
         if response.status_code == 200:
             return OrderBook.from_dict(response.json())

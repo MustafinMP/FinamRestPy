@@ -1,35 +1,76 @@
 from finam_rest_py.exceptions import FinamResponseFailureException
-from finam_rest_py.models import Order, FullOrder
+from finam_rest_py.models import Order, OrderInfo
 from finam_rest_py.services.base_service import AsyncBaseService
 
 
 class OrderService(AsyncBaseService):
-    async def get_order(self, order_id: str) -> FullOrder:
+    async def get_order(self, order_id: str) -> OrderInfo:
+        """Получает информацию о заявке.
+
+        Args:
+            order_id (str): ID заявки.
+
+        Returns:
+            OrderInfo: данные о заявке.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
         response = await self._session.get(f'accounts/{self._account_id}/orders/{order_id}')
         if response.status_code == 200:
-            return FullOrder.from_dict(response.json())
+            return OrderInfo.from_dict(response.json())
         raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
                                             text=response.text)
 
-    async def get_orders(self) -> list[FullOrder]:
+    async def get_orders(self) -> list[OrderInfo]:
+        """Получает данные обо всех заявках.
+
+        Returns:
+            list[OrderInfo]: данные обо всех заявках.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
         response = await self._session.get(f'accounts/{self._account_id}/orders')
         if response.status_code == 200:
-            return [FullOrder.from_dict(o) for o in response.json()['orders']]
+            return [OrderInfo.from_dict(o) for o in response.json()['orders']]
         raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
                                             text=response.text)
 
-    async def place_order(self, order: Order) -> FullOrder:
+    async def place_order(self, order: Order) -> OrderInfo:
+        """Размещает заявку на бирже.
+
+        Args:
+            order (Order): размещаемая заявка.
+
+        Returns:
+            OrderInfo: информация о размещенной заявке.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
         if order.account_id is None:
             order.account_id = self._base_module._account_id
         response = await self._session.post(f'accounts/{self._account_id}/orders', json=order.to_dict())
         if response.status_code == 200:
-            return FullOrder.from_dict(response.json())
+            return OrderInfo.from_dict(response.json())
         raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
                                             text=response.text)
 
-    async def cancel_order(self, order_id: str) -> FullOrder:
+    async def cancel_order(self, order_id: str) -> OrderInfo:
+        """Отменяет размещенную заявку.
+
+        Args:
+            order_id (str): ID размещенной заявки.
+
+        Returns:
+            OrderInfo: информация об отменяемой заявке.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
         response = await self._session.delete(f'accounts/{self._account_id}/orders/{order_id}')
         if response.status_code == 200:
-            return FullOrder.from_dict(response.json())
+            return OrderInfo.from_dict(response.json())
         raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
                                             text=response.text)
