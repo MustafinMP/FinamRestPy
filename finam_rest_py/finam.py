@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import threading
 from typing import Optional
 
 import httpx
@@ -17,7 +16,6 @@ from finam_rest_py.services.order import OrderService
 class Finam:
     _base_url = 'https://api.finam.ru/v1/'
     _jwt_token_dict = dict()
-    _lock = threading.Lock()
 
     def __init__(self, user_token: str, account_id: str):
         self.account = AccountService(self)
@@ -55,9 +53,8 @@ class Finam:
                 headers={'Content-Type': 'application/json', 'Accept': 'application/json'},
                 timeout=10
         ) as session:
-            with Finam._lock:
-                response = await session.post(f'sessions', data=json.dumps({'secret': self._user_token}))
-                self._jwt_token_dict[self._user_token] = response.json()['token']
+            response = await session.post(f'sessions', data=json.dumps({'secret': self._user_token}))
+            self._jwt_token_dict[self._user_token] = response.json()['token']
 
     async def _refresh_jwt_token_loop(self) -> None:
         period_in_seconds = 14 * 60 + 30
@@ -78,10 +75,9 @@ class Finam:
         return self._session
 
     def _headers(self):
-        with Finam._lock:
-            return {"Authorization": f"{self._jwt_token_dict[self._user_token]}",
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'}
+        return {"Authorization": f"{self._jwt_token_dict[self._user_token]}",
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'}
 
     def set_account(self, account_id: str) -> None:
         """Переключает аккаунт пользователя.
