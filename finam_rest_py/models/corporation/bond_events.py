@@ -20,10 +20,11 @@ class BondCouponEvent(BondEvent):
     @classmethod
     def from_dict(cls, data: dict) -> BondCouponEvent:
         details = data['coupon_details']
+        print(details)
         return BondCouponEvent(
             date=date(year=data['date']['year'], month=data['date']['month'], day=data['date']['day']),
-            start_date=date(year=details['start_date']['year'], month=data['start_date']['month'],
-                            day=data['start_date']['day']),
+            start_date=date(year=details['start_date']['year'], month=details['start_date']['month'],
+                            day=details['start_date']['day']),
             record_date=date(year=details['record_date']['year'], month=details['record_date']['month'],
                              day=details['record_date']['day']),
             face_value=float(details['face_value']['value']),

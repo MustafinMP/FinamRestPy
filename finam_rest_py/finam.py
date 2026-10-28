@@ -3,6 +3,7 @@ from __future__ import annotations
 from finam_rest_py._session_manager import SessionManager
 from finam_rest_py.services.account import AccountService
 from finam_rest_py.services.assets import AssetService
+from finam_rest_py.services.corporation import CorporationService
 from finam_rest_py.services.market import MarketService
 from finam_rest_py.services.metrics import MetricsService
 from finam_rest_py.services.order import OrderService
@@ -21,9 +22,14 @@ class Finam:
         self.market = MarketService(self, session_manager)
         self.metrics = MetricsService(self, session_manager)
         self.report = ReportService(self, session_manager)
+        self._corporation = CorporationService(self, session_manager)
         self.streams = Stream(self._ws_url, self, session_manager)
 
         self._account_id = account_id
+
+    @property
+    def corporation(self) -> CorporationService:
+        return self._corporation
 
     @classmethod
     async def create(cls, user_token: str, account_id: str) -> Finam:
