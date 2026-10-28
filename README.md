@@ -1,5 +1,3 @@
-from finam_rest_py.models import Account
-
 # FinamRestPy
 
 FinamRestPy - асинхронная библиотека-обертка над Finam Trade API (REST, WebSocket) (https://tradeapi.finam.ru/).
