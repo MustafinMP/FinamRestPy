@@ -7,9 +7,16 @@ from finam_rest_py.services.base_service import AsyncBaseService
 
 
 class CorporationService(AsyncBaseService):
-    async def _get_bonds_events(self, symbol: str, date_from: date, date_to: date, desc: bool = False,
-                                limit: int | None = None, offset: int | None = None, past: bool = False) -> list[
-        BondEvent]:
+    async def _get_bonds_events(
+            self,
+            symbol: str,
+            date_from: date,
+            date_to: date,
+            desc: bool = False,
+            limit: int | None = None,
+            offset: int | None = None,
+            past: bool = False
+    ) -> list[BondEvent]:
         """получает метрики об использовании API.
 
         Returns:
