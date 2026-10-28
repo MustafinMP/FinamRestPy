@@ -49,11 +49,14 @@ class Transaction:
     timestamp: datetime
     symbol: str
     change: Optional[MoneyModel]
-    trade: Optional[Trade, None]
-    # такое дублирование поля category было в API, в будущем оно будет убрано из библиотеки (но не факт, что из API тоже)
+    trade: Optional[Trade]
+    # такое дублирование поля category было в API, в будущем оно будет убрано из библиотеки
+    # P.s. но не факт, что из API тоже :)
     transaction_category: TransactionCategory
     transaction_name: str
-    change_qty: Optional[float, None]
+    change_qty: Optional[float]
+    change_original: Optional[MoneyModel]
+    symbols: list[str]
 
     @classmethod
     def from_dict(cls, transaction: dict) -> Transaction:
@@ -66,5 +69,8 @@ class Transaction:
             trade=Trade.from_dict(transaction['trade']) if 'trade' in transaction.keys() else None,
             transaction_category=TransactionCategory.from_str(transaction['transaction_category']),
             transaction_name=transaction['transaction_name'],
-            change_qty=float(transaction['change_qty']) if 'change_qty' in transaction.keys() else None
+            change_qty=float(transaction['change_qty']) if 'change_qty' in transaction.keys() else None,
+            change_original=MoneyModel.from_dict(transaction['change_original'])
+            if 'change_original' in transaction.keys() else None,
+            symbols=transaction['symbols'],
         )

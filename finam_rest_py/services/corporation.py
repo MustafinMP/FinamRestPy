@@ -42,8 +42,7 @@ class CorporationService(AsyncBaseService):
         if response.status_code == 200:
             event_types = {'COUPON': BondCouponEvent, 'AMORTIZATION': BondAmortizationEvent, 'OFFER': BondOfferEvent}
             return [event_types[event['type']].from_dict(event) for event in response.json()['events']]
-        raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
-                                            text=response.text)
+        raise FinamResponseFailureException(response)
 
     async def get_future_bonds_events(self, symbol: str, date_from: date, date_to: date, desc: bool = False,
                                       limit: int | None = None, offset: int | None = None) -> list[BondEvent]:

@@ -33,7 +33,7 @@ class ShortableStatus(Enum):
     AVAILABLE_STRATEGY = 4  # Разрешено в составе стратег
 
     @classmethod
-    def from_str(cls, string: str) -> LongableStatus:
+    def from_str(cls, string: str) -> ShortableStatus:
         match string:
             case 'NOT_AVAILABLE':
                 return cls.NOT_AVAILABLE
@@ -83,9 +83,9 @@ class AssetParams:
     long_collateral: MoneyModel
     short_risk_rate: float
     short_collateral: MoneyModel
-    long_initial_margin: Optional[MoneyModel, None]
-    short_initial_margin: Optional[MoneyModel, None]
-    price_type: Optional[str | None]
+    long_initial_margin: Optional[MoneyModel]
+    short_initial_margin: Optional[MoneyModel]
+    price_type: Optional[PriceType | None]
 
     @classmethod
     def from_dict(cls, params_dict: dict) -> AssetParams:

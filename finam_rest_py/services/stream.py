@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Iterable, TYPE_CHECKING
+from typing import TYPE_CHECKING, AsyncGenerator
 
 import websockets
 
@@ -17,7 +17,7 @@ class Stream:
         self._base_module = base_module
         self._session_manager = session_manager
 
-    async def bars_stream(self, symbol: str, timeframe: TimeFrame) -> Iterable[list[Bar]]:
+    async def bars_stream(self, symbol: str, timeframe: TimeFrame) -> AsyncGenerator[list[Bar]]:
         async with websockets.connect(self._ws_url) as ws:
             await ws.send(json.dumps({
                 "action": "SUBSCRIBE",
@@ -33,7 +33,7 @@ class Stream:
                 elif message['type'] == 'ERROR':
                     raise ValueError(message['error_info']['message'])
 
-    async def order_book_stream(self, symbol: str) -> Iterable[OrderBook]:
+    async def order_book_stream(self, symbol: str) -> AsyncGenerator[OrderBook]:
         async with websockets.connect(self._ws_url) as ws:
             await ws.send(json.dumps({
                 "action": "SUBSCRIBE",
@@ -48,7 +48,7 @@ class Stream:
                 elif message['type'] == 'ERROR':
                     raise ValueError(message['error_info']['message'])
 
-    async def quotes_stream(self, *symbols: str) -> Iterable[list[Quote]]:
+    async def quotes_stream(self, *symbols: str) -> AsyncGenerator[list[Quote]]:
         async with websockets.connect(self._ws_url) as ws:
             await ws.send(json.dumps({
                 "action": "SUBSCRIBE",
@@ -63,7 +63,7 @@ class Stream:
                 elif message['type'] == 'ERROR':
                     raise ValueError(message['error_info']['message'])
 
-    async def latest_trades_stream(self, symbol: str) -> Iterable[AssetTrade]:
+    async def latest_trades_stream(self, symbol: str) -> AsyncGenerator[list[AssetTrade]]:
         async with websockets.connect(self._ws_url) as ws:
             await ws.send(json.dumps({
                 "action": "SUBSCRIBE",
@@ -78,7 +78,7 @@ class Stream:
                 elif message['type'] == 'ERROR':
                     raise ValueError(message['error_info']['message'])
 
-    async def account_orders_stream(self, account_id: int = None) -> Iterable[list[OrderInfo]]:
+    async def account_orders_stream(self, account_id: int | None = None) -> AsyncGenerator[list[OrderInfo]]:
         async with websockets.connect(self._ws_url) as ws:
             await ws.send(json.dumps({
                 "action": "SUBSCRIBE",
@@ -96,7 +96,7 @@ class Stream:
                 elif message['type'] == 'ERROR':
                     raise ValueError(message['error_info']['message'])
 
-    async def account_trades_stream(self, account_id: int = None) -> Iterable[list[Trade]]:
+    async def account_trades_stream(self, account_id: int | None = None) -> AsyncGenerator[list[Trade]]:
         async with websockets.connect(self._ws_url) as ws:
             await ws.send(json.dumps({
                 "action": "SUBSCRIBE",
@@ -114,7 +114,7 @@ class Stream:
                 elif message['type'] == 'ERROR':
                     raise ValueError(message['error_info']['message'])
 
-    async def account_changes_stream(self, account_id: int = None) -> Iterable[Account]:
+    async def account_changes_stream(self, account_id: int | None = None) -> AsyncGenerator[Account]:
         async with websockets.connect(self._ws_url) as ws:
             await ws.send(json.dumps({
                 "action": "SUBSCRIBE",

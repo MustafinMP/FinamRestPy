@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+import asyncio
 from typing import TYPE_CHECKING
 
 from finam_rest_py._session_manager import SessionManager

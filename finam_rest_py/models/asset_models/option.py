@@ -27,10 +27,10 @@ class Option:
     symbol: str
     type: OptionType
     contract_size: float
-    trade_first_day: Optional[datetime, None]
+    trade_first_day: Optional[datetime | None]
     trade_last_day: datetime
     strike: float
-    multiplier: Optional[float, None]
+    multiplier: Optional[float | None]
     expiration_first_day: datetime
     expiration_last_day: datetime
 
