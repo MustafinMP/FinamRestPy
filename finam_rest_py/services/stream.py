@@ -83,7 +83,8 @@ class Stream:
             await ws.send(json.dumps({
                 "action": "SUBSCRIBE",
                 "type": "ORDERS",
-                "data": {"account_id": account_id if account_id is not None else self._base_module.get_account()},
+                "data": {"account_id": account_id if account_id is not None
+                else self._base_module.get_current_account_id()},
                 "token": self._session_manager.get_auth_token()}))
             async for raw_message in ws:
                 message = json.loads(raw_message)
@@ -101,7 +102,8 @@ class Stream:
             await ws.send(json.dumps({
                 "action": "SUBSCRIBE",
                 "type": "TRADES",
-                "data": {"account_id": account_id if account_id is not None else self._base_module.get_account()},
+                "data": {"account_id": account_id if account_id is not None
+                else self._base_module.get_current_account_id()},
                 "token": self._session_manager.get_auth_token()}))
             async for raw_message in ws:
                 message = json.loads(raw_message)
@@ -119,7 +121,8 @@ class Stream:
             await ws.send(json.dumps({
                 "action": "SUBSCRIBE",
                 "type": "ACCOUNT",
-                "data": {"account_id": account_id if account_id is not None else self._base_module.get_account()},
+                "data": {"account_id": account_id if account_id is not None
+                else self._base_module.get_current_account_id()},
                 "token": self._session_manager.get_auth_token()}))
             async for raw_message in ws:
                 message = json.loads(raw_message)

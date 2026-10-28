@@ -55,7 +55,7 @@ class OrderService(AsyncBaseService):
             FinamResponseFailureException: если произошла ошибка запроса к серверу.
         """
         if order.account_id is None:
-            order.account_id = self._base_module.get_account()
+            order.account_id = self._base_module.get_current_account_id()
         response = await self._session.post(f'accounts/{self._account_id}/orders', json=order.to_dict())
         if response.status_code == 401 or response.status_code == 500:
             await self._session_manager.refresh_session()
