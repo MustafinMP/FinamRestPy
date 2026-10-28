@@ -20,7 +20,7 @@ async def main():
         print(trade)
 
     print('Get transactions example')
-    transactions = await finam.account.transactions(datetime.datetime.now(), limit=20)
+    transactions = await finam.account.get_transactions(datetime.datetime.now(), limit=20)
     for transaction in transactions:
         print(transaction)
 

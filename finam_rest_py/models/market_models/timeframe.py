@@ -33,9 +33,9 @@ class TimeFrame(Enum):
     MN = 21  # Месяц. Глубина данных 365 * 5 дней.
     QR = 22  # Квартал. Глубина данных 365 * 5 дней.
 
-    def max_deep(self) -> timedelta:
+    def max_date_range(self) -> timedelta:
         if self.value == 0:
-            return None
+            return timedelta(days=0)
         return {
             1: timedelta(days=7),
             5: timedelta(days=30),

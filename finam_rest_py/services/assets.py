@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import AsyncGenerator
 
 from finam_rest_py.exceptions import FinamResponseFailureException
 from finam_rest_py.models import Exchange, ScheduleSession, Asset, FullAsset, Option, AssetParams, Constituent
@@ -18,30 +19,45 @@ class AssetService(AsyncBaseService):
         """
         response = await self._session.get('assets')
         if response.status_code == 401 or response.status_code == 500:
-            await self._base_module.refresh_session()
+            await self._session_manager.refresh_session()
             response = await self._session.get('assets')
         if response.status_code == 200:
             return [Asset.from_dict(a) for a in response.json()['assets']]
-        raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
-                                            text=response.text)
+        raise FinamResponseFailureException(response)
 
-    async def get_all_assets(self) -> list[Asset]:
+    async def get_all_assets(self, only_active: bool = False, only_disabled: bool = False) -> AsyncGenerator[Asset]:
         """Получает список инструментов (в том числе архивных), их описание.
 
-                Returns:
-                    list[Asset]: список всех инструментов.
+        Args:
+            only_active (bool): выбираются только активные (неархивные) инструменты
+            only_disabled (bool): выбираются только архивные (неактивные) инструменты
 
-                Raises:
-                    FinamResponseFailureException: если произошла ошибка запроса к серверу.
-                """
-        response = await self._session.get('assets/all')
-        if response.status_code == 401 or response.status_code == 500:
-            await self._base_module.refresh_session()
-            response = await self._session.get('assets/all')
-        if response.status_code == 200:
-            return [Asset.from_dict(a) for a in response.json()['assets']]
-        raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
-                                            text=response.text)
+        Returns:
+            AsyncGenerator[Asset]: список всех инструментов.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
+        if only_active and only_disabled:
+            raise ValueError('only_active and only_disabled are mutually exclusive')
+        next_cursor: int | None = None
+        while True:
+            params: dict[str, bool | int] = {'only_active': only_active, 'only_disabled': only_disabled}
+            if next_cursor:
+                params['cursor'] = next_cursor
+            response = await self._session.get('assets/all', params=params)
+            if response.status_code == 401 or response.status_code == 500:
+                await self._session_manager.refresh_session()
+                response = await self._session.get('assets/all', params=params)
+            if response.status_code == 200:
+                data = response.json()
+                next_cursor = data['next_cursor']
+                for a in data['assets']:
+                    yield Asset.from_dict(a)
+                if next_cursor is None or next_cursor == 0:
+                    break
+            else:
+                raise FinamResponseFailureException(response)
 
     async def get_clock(self) -> datetime:
         """Получает текущее время на сервере (локализованное).
@@ -54,15 +70,17 @@ class AssetService(AsyncBaseService):
         """
         response = await self._session.get('assets/clock')
         if response.status_code == 401 or response.status_code == 500:
-            await self._base_module.refresh_session()
+            await self._session_manager.refresh_session()
             response = await self._session.get('assets/clock')
         if response.status_code == 200:
             return formatted_datetime(response.json()['timestamp'])
-        raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
-                                            text=response.text)
+        raise FinamResponseFailureException(response)
 
     async def get_constituents(self, index_symbol: str) -> list[Constituent]:
         """Получает состав биржевого индекса по его символу.
+
+        Args:
+            index_symbol (str): символ индекса в формате ticker@mic.
 
         Returns:
             list[Constituent]: состав индекса.
@@ -72,12 +90,11 @@ class AssetService(AsyncBaseService):
         """
         response = await self._session.get(f'assets/{index_symbol}/constituents')
         if response.status_code == 401 or response.status_code == 500:
-            await self._base_module.refresh_session()
+            await self._session_manager.refresh_session()
             response = await self._session.get(f'assets/{index_symbol}/constituents')
         if response.status_code == 200:
             return [Constituent.from_dict(c) for c in response.json()['constituents']]
-        raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
-                                            text=response.text)
+        raise FinamResponseFailureException(response)
 
     async def get_exchanges(self) -> list[Exchange]:
         """Получает список доступных бирж, названия и mic коды.
@@ -90,12 +107,11 @@ class AssetService(AsyncBaseService):
         """
         response = await self._session.get('exchanges')
         if response.status_code == 401 or response.status_code == 500:
-            await self._base_module.refresh_session()
+            await self._session_manager.refresh_session()
             response = await self._session.get('exchanges')
         if response.status_code == 200:
             return [Exchange.from_dict(e) for e in response.json()['exchanges']]
-        raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
-                                            text=response.text)
+        raise FinamResponseFailureException(response)
 
     async def get_asset(self, symbol: str) -> FullAsset:
         """Получает подробную информацию по конкретному инструменту.
@@ -112,15 +128,14 @@ class AssetService(AsyncBaseService):
         response = await self._session.get(f'assets/{symbol}',
                                            params={'symbol': symbol, 'account_id': self._account_id})
         if response.status_code == 401 or response.status_code == 500:
-            await self._base_module.refresh_session()
+            await self._session_manager.refresh_session()
             response = await self._session.get(f'assets/{symbol}',
                                                params={'symbol': symbol, 'account_id': self._account_id})
         if response.status_code == 200:
             return FullAsset.from_dict(response.json())
-        raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
-                                            text=response.text)
+        raise FinamResponseFailureException(response)
 
-    async def get_asset_params(self, symbol: str, account_id: str = None):
+    async def get_asset_params(self, symbol: str, account_id: str | None = None) -> AssetParams:
         """Получает торговые параметры по инструменту.
 
         Args:
@@ -136,17 +151,16 @@ class AssetService(AsyncBaseService):
         params = {'symbol': symbol, 'account_id': account_id if account_id else self._account_id}
         response = await self._session.get(f'assets/{symbol}/params', params=params)
         if response.status_code == 401 or response.status_code == 500:
-            await self._base_module.refresh_session()
+            await self._session_manager.refresh_session()
             response = await self._session.get(f'assets/{symbol}/params', params=params)
         if response.status_code == 200:
             return AssetParams.from_dict(response.json())
-        raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
-                                            text=response.text)
+        raise FinamResponseFailureException(response)
 
     async def get_options_chain(self,
                                 underlying_symbol: str,
-                                root: str = None,
-                                expiration_date: datetime = None) -> list[Option]:
+                                root: str | None = None,
+                                expiration_date: datetime | None = None) -> list[Option]:
         """Получает цепочку опционов для базового актива.
 
         Args:
@@ -160,7 +174,7 @@ class AssetService(AsyncBaseService):
         Raises:
             FinamResponseFailureException: если произошла ошибка запроса к серверу.
         """
-        params = {'underlying_symbol': underlying_symbol}
+        params: dict[str, str | int] = {'underlying_symbol': underlying_symbol}
         if root:
             params['root'] = root
         if expiration_date:
@@ -173,10 +187,9 @@ class AssetService(AsyncBaseService):
             response = await self._session.get(f'assets/{underlying_symbol}/options', params=params)
         if response.status_code == 200:
             return [Option.from_dict(op) for op in response.json()['options']]
-        raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
-                                            text=response.text)
+        raise FinamResponseFailureException(response)
 
-    async def get_schedule(self, symbol: str, only_today=False) -> list[ScheduleSession]:
+    async def get_schedule(self, symbol: str, only_today: bool = False) -> list[ScheduleSession]:
         """Получает расписание торгов для инструмента.
 
         Args:
@@ -202,5 +215,4 @@ class AssetService(AsyncBaseService):
                 sessions,
                 key=lambda s: s.open_time
             )
-        raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
-                                            text=response.text)
+        raise FinamResponseFailureException(response)

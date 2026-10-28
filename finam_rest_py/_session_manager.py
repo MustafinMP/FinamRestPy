@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Optional
 
 import httpx
+
+from finam_rest_py.exceptions import FinamResponseFailureException
 
 
 class SessionManager:
@@ -14,7 +15,7 @@ class SessionManager:
         self._base_url = base_url
         self._user_token = user_token
 
-        self._session: Optional[httpx.AsyncClient] = None
+        self._session: httpx.AsyncClient = None
 
     @classmethod
     async def create(cls, base_url: str, user_token: str) -> SessionManager:
@@ -60,7 +61,7 @@ class SessionManager:
             except httpx.ReadTimeout:
                 print('Таймаут при обновлении токена, повторная попытка обновления')
 
-    def _get_new_session(self):
+    def _get_new_session(self) -> httpx.AsyncClient:
         return httpx.AsyncClient(
             base_url=self._base_url,
             timeout=30,
@@ -72,3 +73,28 @@ class SessionManager:
         return {"Authorization": f"Bearer {self._jwt_token_dict[self._user_token]}",
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'}
+
+    async def get_all_account_ids(self) -> list[str]:
+        """Получает список ID доступных аккаунтов.
+
+        Returns:
+            list[str]: список ID доступных аккаунтов.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
+        async with httpx.AsyncClient(
+                base_url=self._base_url,
+                headers={'Content-Type': 'application/json', 'Accept': 'application/json'},
+                timeout=10
+        ) as session:
+            response = await session.post('sessions/details', json={'token': self._jwt_token_dict[self._user_token]})
+            if response.status_code == 401 or response.status_code == 500:
+                await self.refresh_session()
+                response = await session.post(
+                    'sessions/details',
+                    json={'token': self._jwt_token_dict[self._user_token]}
+                )
+            if response.status_code == 200:
+                return response.json()['account_ids']
+            raise FinamResponseFailureException(response)

@@ -1,3 +1,5 @@
+from finam_rest_py.models import Account
+
 # FinamRestPy
 
 FinamRestPy - асинхронная библиотека-обертка над Finam Trade API (REST, WebSocket) (https://tradeapi.finam.ru/).
@@ -41,7 +43,7 @@ import asyncio
 from finam_rest_py import Finam
 
 finam = asyncio.run(Finam.create('your_finam_token', 'your_account_id'))
-finam.set_account('your_other_account_id')
+finam.set_account_id('your_other_account_id')
 ```
 
 Ниже представлен пример запроса для получения информации об аккаунте:
@@ -49,11 +51,12 @@ finam.set_account('your_other_account_id')
 ```python
 import asyncio
 from finam_rest_py import Finam
+from finam_rest_py.models.account_models import Account
 
 
 async def main():
     finam = await Finam.create('your_finam_token', 'your_account_id')
-    account = await finam.account.get_account()
+    account: Account = await finam.account.get_account()
     print(account)
 
 

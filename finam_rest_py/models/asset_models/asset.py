@@ -36,7 +36,7 @@ class Asset:
 class FullAsset(Asset):
     min_price_step: float
     lot_size: float
-    expiration_date: Optional[datetime, None]
+    expiration_date: Optional[datetime | None]
     quote_currency: Optional[str | None]
 
     @classmethod

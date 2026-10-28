@@ -21,13 +21,15 @@ class AccountService(AsyncBaseService):
             response = await self._session.get(f'accounts/{self._account_id}')
         if response.status_code == 200:
             return Account.from_dict(response.json())
-        raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
-                                            text=response.text)
+        raise FinamResponseFailureException(response)
+
+    async def get_all_account_ids(self) -> list[str]:
+        return await self._session_manager.get_all_account_ids()
 
     async def get_trades(self,
                          end_time: datetime,
-                         start_time: datetime = None,
-                         limit: int = None) -> list[AssetTrade]:
+                         start_time: datetime | None = None,
+                         limit: int | None = None) -> list[AssetTrade]:
         """Получает истории по сделкам аккаунта.
 
         Args:
@@ -41,7 +43,7 @@ class AccountService(AsyncBaseService):
         Raises:
             FinamResponseFailureException: если произошла ошибка запроса к серверу.
         """
-        params = {'interval.end_time': end_time.isoformat() + 'Z'}
+        params: dict[str, str | int] = {'interval.end_time': end_time.isoformat() + 'Z'}
         if start_time:
             params['interval.start_time'] = start_time.isoformat() + 'Z'
         if limit:
@@ -53,13 +55,12 @@ class AccountService(AsyncBaseService):
             response = await self._session.get(f'accounts/{self._account_id}/trades', params=params)
         if response.status_code == 200:
             return [AssetTrade.from_dict(t) for t in response.json()['trades']]
-        raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
-                                            text=response.text)
+        raise FinamResponseFailureException(response)
 
-    async def transactions(self,
-                           end_time: datetime,
-                           start_time: datetime = None,
-                           limit: int = None) -> list[Transaction]:
+    async def get_transactions(self,
+                               end_time: datetime,
+                               start_time: datetime | None = None,
+                               limit: int | None = None) -> list[Transaction]:
         """Получает список транзакций аккаунта.
 
         Args:
@@ -73,7 +74,7 @@ class AccountService(AsyncBaseService):
         Raises:
             FinamResponseFailureException: если произошла ошибка запроса к серверу.
         """
-        params = {'interval.end_time': end_time.isoformat() + 'Z'}
+        params: dict[str, str | int] = {'interval.end_time': end_time.isoformat() + 'Z'}
         if start_time:
             params['interval.start_time'] = start_time.isoformat() + 'Z'
         if limit:
@@ -85,5 +86,4 @@ class AccountService(AsyncBaseService):
             response = await self._session.get(f'accounts/{self._account_id}/transactions', params=params)
         if response.status_code == 200:
             return [Transaction.from_dict(t) for t in response.json()['transactions']]
-        raise FinamResponseFailureException(status_code=response.status_code, reason=response.reason_phrase,
-                                            text=response.text)
+        raise FinamResponseFailureException(response)

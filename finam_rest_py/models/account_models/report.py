@@ -8,7 +8,7 @@ from typing import Optional
 @dataclass
 class Report:
     report_id: str
-    status: int
+    status: str
     date_begin: datetime
     date_end: datetime
     report_form: str

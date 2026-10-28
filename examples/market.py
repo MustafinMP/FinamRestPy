@@ -15,7 +15,7 @@ async def main():
 
     print('Get bars example')
     now = datetime.datetime.now()
-    bars = await finam.market.get_bars(symbol, TimeFrame.H1, now - TimeFrame.H1.max_deep(), now)
+    bars = await finam.market.get_bars(symbol, TimeFrame.H1, now - TimeFrame.H1.max_date_range(), now)
 
     for bar in bars:
         print(bar)
