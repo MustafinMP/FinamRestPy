@@ -23,6 +23,9 @@ class AccountService(AsyncBaseService):
             return Account.from_dict(response.json())
         raise FinamResponseFailureException(response)
 
+    async def get_all_account_ids(self) -> list[str]:
+        return await self._session_manager.get_all_account_ids()
+
     async def get_trades(self,
                          end_time: datetime,
                          start_time: datetime | None = None,

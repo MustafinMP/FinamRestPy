@@ -4,6 +4,8 @@ import asyncio
 
 import httpx
 
+from finam_rest_py.exceptions import FinamResponseFailureException
+
 
 class SessionManager:
     _lock = None
@@ -71,3 +73,28 @@ class SessionManager:
         return {"Authorization": f"Bearer {self._jwt_token_dict[self._user_token]}",
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'}
+
+    async def get_all_account_ids(self) -> list[str]:
+        """Получает список ID доступных аккаунтов.
+
+        Returns:
+            list[str]: список ID доступных аккаунтов.
+
+        Raises:
+            FinamResponseFailureException: если произошла ошибка запроса к серверу.
+        """
+        async with httpx.AsyncClient(
+                base_url=self._base_url,
+                headers={'Content-Type': 'application/json', 'Accept': 'application/json'},
+                timeout=10
+        ) as session:
+            response = await session.post('sessions/details', json={'token': self._jwt_token_dict[self._user_token]})
+            if response.status_code == 401 or response.status_code == 500:
+                await self.refresh_session()
+                response = await session.post(
+                    'sessions/details',
+                    json={'token': self._jwt_token_dict[self._user_token]}
+                )
+            if response.status_code == 200:
+                return response.json()['account_ids']
+            raise FinamResponseFailureException(response)
