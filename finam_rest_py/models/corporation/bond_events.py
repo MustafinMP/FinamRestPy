@@ -11,8 +11,8 @@ class BondEvent:
 
 @dataclass
 class BondCouponEvent(BondEvent):
-    record_date: date
-    start_date: date
+    record_date: date | None
+    start_date: date | None
     face_value: float
     value_percent: float
     value: float
@@ -23,9 +23,9 @@ class BondCouponEvent(BondEvent):
         return BondCouponEvent(
             date=date(year=data['date']['year'], month=data['date']['month'], day=data['date']['day']),
             start_date=date(year=details['start_date']['year'], month=details['start_date']['month'],
-                            day=details['start_date']['day']),
+                            day=details['start_date']['day']) if details['start_date']['year'] != 0 else None,
             record_date=date(year=details['record_date']['year'], month=details['record_date']['month'],
-                             day=details['record_date']['day']),
+                             day=details['record_date']['day']) if details['record_date']['year'] != 0 else None,
             face_value=float(details['face_value']['value']),
             value_percent=float(details['value_percent']['value']),
             value=float(data['value']['value']),
@@ -55,8 +55,8 @@ class BondAmortizationEvent(BondEvent):
 class BondOfferEvent(BondEvent):
     offer_type: str
     price: float
-    start_date: date
-    end_date: date
+    start_date: date | None
+    end_date: date | None
 
     @classmethod
     def from_dict(cls, data: dict) -> BondOfferEvent:
@@ -66,7 +66,7 @@ class BondOfferEvent(BondEvent):
             offer_type=details['offer_type'],
             price=float(details['price']['value']),
             start_date=date(year=details['start_date']['year'], month=details['start_date']['month'],
-                            day=details['start_date']['day']),
+                            day=details['start_date']['day']) if details['start_date']['year'] != 0 else None,
             end_date=date(year=details['end_date']['year'], month=details['end_date']['month'],
-                          day=details['end_date']['day']),
+                          day=details['end_date']['day']) if details['end_date']['year'] != 0 else None,
         )
